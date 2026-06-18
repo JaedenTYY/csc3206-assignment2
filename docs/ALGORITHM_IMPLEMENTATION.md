@@ -92,6 +92,29 @@ def astar(metric: str = "distance") -> dict:
 
 For comparison and algorithmic evaluation purposes, two other algorithms are also implemented:
 
+```mermaid
+flowchart LR
+
+A[A* Search]
+
+A --> A1[g(n)]
+A --> A2[h(n)]
+A --> A3[f = g + h]
+
+B[Uniform Cost Search]
+
+B --> B1[g(n) Only]
+
+C[Greedy Best-First]
+
+C --> C1[h(n) Only]
+
+A3 --> D[Optimal]
+B1 --> D
+
+C1 --> E[Fast but<br/>Not Guaranteed Optimal]
+```
+
 ### 3.1 Uniform Cost Search (UCS)
 - **Uninformed**: Expands nodes based strictly on the path cost $g(n)$.
 - **Optimality**: Guaranteed to find the optimal path.
@@ -107,6 +130,32 @@ For comparison and algorithmic evaluation purposes, two other algorithms are als
 ## 4. How to Run the Algorithms
 
 You can execute the implemented algorithms via the central command-line interface in `src/main.py`.
+
+```mermaid
+flowchart TD
+
+A([User Executes Program])
+
+A --> B[Load Graph Data]
+
+B --> C{Selected Option}
+
+C -->|Default| D[A* Search]
+
+C -->|--compare| E[Run A*, UCS, GBFS]
+
+C -->|--visualize| F[A* Search + Graph Plot]
+
+D --> G[Optimal Route]
+
+E --> H[Comparison Table]
+
+F --> I[Network Visualization]
+
+G --> J([End])
+H --> J
+I --> J
+```
 
 ### 4.1 Prerequisites
 Ensure your virtual environment is active and dependencies are installed:
