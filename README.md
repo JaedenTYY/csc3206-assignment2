@@ -103,6 +103,45 @@ See [SETUP.md](docs/SETUP.md) for detailed environment setup.
 
 ---
 
+## 🏛️ Software Architecture
+
+Our codebase is structured into three main layers: **Data**, **Algorithms**, and **Visualization**. The central execution script `main.py` coordinates between these layers based on the user's CLI arguments.
+
+```mermaid
+graph TD
+    Main["src/main.py<br>(CLI Entry Point)"]
+    
+    subgraph "Data Layer"
+        Graph["src/data/graph.py<br>(Distance/Time Matrices)"]
+    end
+    
+    subgraph "Algorithm Layer"
+        AStar["src/algorithms/astar.py<br>(A* Search)"]
+        UCS["src/algorithms/ucs.py<br>(Uniform Cost Search)"]
+        GBFS["src/algorithms/gbfs.py<br>(Greedy Best-First)"]
+    end
+    
+    subgraph "Visualization Layer"
+        Plot["src/visualization/plot.py<br>(Matplotlib & NetworkX)"]
+    end
+    
+    Main -->|1. Loads Graph Data| Graph
+    Main -->|2. Executes Search| AStar
+    Main -.->|Optional Comparison| UCS
+    Main -.->|Optional Comparison| GBFS
+    
+    AStar -->|3. Output Results| Plot
+    UCS -.-> Plot
+    GBFS -.-> Plot
+```
+
+### Architecture Breakdown
+- **Data Layer**: Responsible for storing the distance matrices, time matrices, and carbon emission data. It provides helper functions to get neighboring nodes and path costs.
+- **Algorithm Layer**: Contains the core logic for navigating the search space. Each algorithm module is isolated, taking the graph data and outputting a standardized dictionary of results (route taken, total cost, nodes expanded).
+- **Visualization Layer**: Responsible for drawing the node map and overlaying the optimal route using `matplotlib` and `networkx`. 
+
+---
+
 ## 📁 Repository Structure
 
 ```
@@ -129,6 +168,7 @@ csc3206-a2/
 │   └── test_algorithms.py  # Unit tests
 │
 ├── docs/
+│   ├── ALGORITHM_IMPLEMENTATION.md # Detailed algorithm & execution docs
 │   ├── SETUP.md            # Environment & execution guide
 │   ├── FORMULATION.md      # AI problem formulation reference
 │   └── TASKS.md            # Task board (this sprint)
