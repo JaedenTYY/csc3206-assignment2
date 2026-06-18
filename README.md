@@ -1,8 +1,17 @@
-# CSC3206 Artificial Intelligence — Assignment 2
-### House Visit Tour: AI Route Planning Implementation
+# 🗺️ House Visit Tour: AI Route Planning Implementation
+
+![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
+![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![AI Algorithms](https://img.shields.io/badge/Algorithms-A*-orange)
+![Visualization](https://img.shields.io/badge/Visualization-Matplotlib-yellow)
 
 > **Group 4 · Sunway University · May Semester 2026**  
 > Deadline: **2 August 2026, 23:59**
+
+---
+
+## 📖 Project Context
+This project implements an intelligent routing system designed to solve a variant of the Traveling Salesperson Problem (TSP). By leveraging advanced Artificial Intelligence search algorithms, our system determines the most efficient path for visiting multiple residential nodes. This has real-world applications in logistics, delivery routing, and urban planning.
 
 ---
 
@@ -43,9 +52,25 @@ Design a **house visit tour** starting from Sunway University that visits the re
 
 ---
 
-## 🤖 Algorithm Chosen
+## 🤖 Algorithm Architecture & Selection
 
-> **[To be confirmed by group — update this section]**
+We evaluate three distinct search strategies to navigate our state space, balancing computational efficiency against path optimality.
+
+```mermaid
+graph TD
+    A[Start Node: Sunway University] --> B{Search Algorithms}
+    B -->|A* Search| C[Optimal & Informed]
+    B -->|Uniform Cost Search| D[Optimal & Uninformed]
+    B -->|Greedy BFS| E[Suboptimal & Fast]
+    C --> F[Evaluate against Goal State]
+    D --> F
+    E --> F
+    F --> G[Compare Metrics]
+    G --> H[Visualization]
+    G --> I[CLI Output]
+```
+
+> **Primary Choice: A\* Search**
 > 
 > Options from Assignment 1 analysis:
 > - Uniform Cost Search (UCS) — uninformed, optimal
