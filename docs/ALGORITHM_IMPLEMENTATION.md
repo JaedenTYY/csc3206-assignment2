@@ -97,22 +97,22 @@ flowchart LR
 
 A[A* Search]
 
-A --> A1[g(n)]
-A --> A2[h(n)]
-A --> A3[f = g + h]
+A --> A1["g(n)"]
+A --> A2["h(n)"]
+A --> A3["f = g + h"]
 
 B[Uniform Cost Search]
 
-B --> B1[g(n) Only]
+B --> B1["g(n) Only"]
 
 C[Greedy Best-First]
 
-C --> C1[h(n) Only]
+C --> C1["h(n) Only"]
 
 A3 --> D[Optimal]
 B1 --> D
 
-C1 --> E[Fast but<br/>Not Guaranteed Optimal]
+C1 --> E["Fast but<br/>Not Guaranteed Optimal"]
 ```
 
 ### 3.1 Uniform Cost Search (UCS)
