@@ -203,9 +203,9 @@ The program should print and/or display:
 
 ## 📝 Submission Checklist
 
-- [ ] Code executes without errors
-- [ ] Output displays the solution (text + graphical)
-- [ ] README / SETUP.md with execution instructions
+- [x] Code executes without errors
+- [x] Output displays the solution (text + graphical)
+- [x] README / SETUP.md with execution instructions
 - [ ] Report with all required sections
 - [ ] Presentation video (≤10 min) uploaded to OneDrive/Google Drive
 - [ ] Video link included in report appendix
