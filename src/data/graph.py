@@ -68,21 +68,42 @@ COST_UNITS = {
 }
 
 
+def validate_metric(metric: str) -> None:
+    """Raise ValueError if the requested optimization metric is unsupported."""
+    if metric not in COST_MATRICES:
+        valid_metrics = ", ".join(sorted(COST_MATRICES))
+        raise ValueError(f"Unsupported cost metric: {metric}. Expected one of: {valid_metrics}")
+
+
+def validate_node(node: str) -> None:
+    """Raise ValueError if the node code is not part of the route graph."""
+    if node not in NODES:
+        valid_nodes = ", ".join(NODES)
+        raise ValueError(f"Unknown node: {node}. Expected one of: {valid_nodes}")
+
+
 def get_cost(from_node: str, to_node: str, metric: str = "distance") -> float:
     """Return the edge cost between two nodes for the given metric."""
+    validate_metric(metric)
+    validate_node(from_node)
+    validate_node(to_node)
     val = COST_MATRICES[metric][from_node][to_node]
     if val is None:
-        raise ValueError(f"No edge from {from_node} to {to_node}")
+        raise ValueError(f"No edge from {from_node} to {to_node} for metric '{metric}'")
     return val
 
 
 def get_neighbours(node: str) -> list[str]:
     """Return all reachable nodes from the given node (excludes SU as destination)."""
+    validate_node(node)
     return [n for n in NODES if n != node and n != "SU"]
 
 
 def has_edge(from_node: str, to_node: str, metric: str = "distance") -> bool:
     """Return True if a valid edge exists between two nodes."""
+    validate_metric(metric)
+    validate_node(from_node)
+    validate_node(to_node)
     val = COST_MATRICES[metric][from_node].get(to_node)
     return val is not None
 

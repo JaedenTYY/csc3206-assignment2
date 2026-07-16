@@ -9,12 +9,12 @@
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 1.1 | Create GitHub repo & invite all members | Jaeden | `[x]` | Done |
-| 1.2 | Confirm algorithm choice for implementation | All | `[ ]` | A* recommended from A1 |
-| 1.3 | Set up Python project structure | Jaeden | `[x]` | See `src/` |
-| 1.4 | Encode distance matrix from A1 Table 1 | Wai | `[ ]` | `src/data/graph.py` |
-| 1.5 | Encode travel time matrix from A1 Table 3 | Wai | `[ ]` | `src/data/graph.py` |
-| 1.6 | Encode carbon emission matrix from A1 Table 6 | Wai | `[ ]` | `src/data/graph.py` |
+| 1.1 | Create GitHub repo & invite all members | Evan | `[x]` | Done |
+| 1.2 | Confirm algorithm choice for implementation | All | `[x]` | A* recommended from A1 |
+| 1.3 | Set up Python project structure | Sohom | `[x]` | See `src/` |
+| 1.4 | Encode distance matrix from A1 Table 1 | Raymond | `[x]` | `src/data/graph.py` |
+| 1.5 | Encode travel time matrix from A1 Table 3 | Chin | `[x]` | `src/data/graph.py` |
+| 1.6 | Encode carbon emission matrix from A1 Table 6 | Jaeden | `[x]` | `src/data/graph.py` |
 
 ---
 
@@ -22,13 +22,13 @@
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 2.1 | Implement state representation `(location, visited_set)` | Wai | `[ ]` | Based on A1 §2.2 |
-| 2.2 | Implement graph / transition model | Evan | `[ ]` | Based on A1 §2.5 |
-| 2.3 | Implement chosen algorithm (`src/algorithms/`) | Chin | `[ ]` | A* or UCS |
-| 2.4 | Implement UCS for comparison | Jaeden | `[ ]` | `src/algorithms/ucs.py` |
-| 2.5 | Implement GBFS for comparison | Raymond | `[ ]` | `src/algorithms/gbfs.py` |
-| 2.6 | Implement MST heuristic (Prim's) for A* | Wai | `[ ]` | `src/algorithms/astar.py` |
-| 2.7 | Wire `main.py` entry point with CLI args | Sohom | `[ ]` | `--compare`, `--visualize` |
+| 2.1 | Implement state representation `(location, visited_set)` | Wai | `[x]` | Based on A1 §2.2 |
+| 2.2 | Implement graph / transition model | Evan | `[x]` | Based on A1 §2.5 |
+| 2.3 | Implement chosen algorithm (`src/algorithms/`) | Chin | `[x]` | A* or UCS |
+| 2.4 | Implement UCS for comparison | Jaeden | `[x]` | `src/algorithms/ucs.py` |
+| 2.5 | Implement GBFS for comparison | Raymond | `[x]` | `src/algorithms/gbfs.py` |
+| 2.6 | Implement admissible MST-based heuristic for A* | Wai | `[x]` | `src/algorithms/astar.py` |
+| 2.7 | Wire `main.py` entry point with CLI args | Sohom | `[x]` | `--compare`, `--visualize` |
 
 ---
 
@@ -36,10 +36,10 @@
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 3.1 | Print optimal route + total cost to console | All | `[ ]` | Required for code marks |
-| 3.2 | Implement route visualization (matplotlib/networkx) | Evan | `[ ]` | `src/visualization/plot.py` |
-| 3.3 | Comparison table output (nodes expanded, cost, time) | Raymond | `[ ]` | Print or export to CSV |
-| 3.4 | Add map background (optional, bonus) | Chin | `[ ]` | Use staticmap or folium |
+| 3.1 | Print optimal route + total cost to console | All | `[x]` | Required for code marks |
+| 3.2 | Implement route visualization (matplotlib/networkx) | Evan | `[x]` | `src/visualization/plot.py` |
+| 3.3 | Comparison table output (nodes expanded, cost, time) | Raymond | `[x]` | Print or export to CSV |
+| 3.4 | Add map background (optional, bonus) | Chin | `[ ]` | Not implemented; current output uses networkx schematic |
 
 ---
 
@@ -47,11 +47,12 @@
 
 | # | Task | Owner | Status | Notes |
 |---|------|-------|--------|-------|
-| 4.1 | Write unit tests for algorithm correctness | Wai | `[ ]` | `tests/test_algorithms.py` |
-| 4.2 | Verify all 6 members visited in output route | All | `[ ]` | Goal state check |
-| 4.3 | Test with different cost metrics (distance vs time vs CO₂) | Evan | `[ ]` | Parameterise cost fn |
-| 4.4 | Clean up code + add docstrings | All | `[ ]` | Before submission |
-| 4.5 | Final `README.md` / `SETUP.md` review | Jaeden | `[ ]` | Must have run instructions |
+| 4.1 | Write unit tests for algorithm correctness | Wai | `[x]` | `tests/test_algorithms.py` |
+| 4.2 | Verify all 6 members visited in output route | All | `[x]` | Goal state check |
+| 4.3 | Test with different cost metrics (distance vs time vs CO₂) | Evan | `[x]` | Parameterise cost fn |
+| 4.4 | Clean up code + add docstrings | All | `[x]` | Before submission |
+| 4.5 | Final `README.md` / `SETUP.md` review | Jaeden | `[x]` | Must have run instructions |
+| 4.6 | Add robust optimality, CLI, heuristic, and visualization tests | All | `[x]` | `15 passed` via `python -m pytest -q` |
 
 ---
 
@@ -84,10 +85,11 @@
 
 ## ✅ Final Submission Checklist
 
-- [ ] `main.py` runs without errors on a fresh Python environment
-- [ ] Output shows the optimal route and total cost (text)
-- [ ] Visualization renders correctly
-- [ ] `SETUP.md` / `README.md` has clear run instructions
+- [x] `main.py` runs without errors on a fresh Python environment
+- [x] Output shows the optimal route and total cost (text)
+- [x] Visualization renders correctly
+- [x] `SETUP.md` / `README.md` has clear run instructions
+- [x] Automated tests pass
 - [ ] Report PDF submitted on portal
 - [ ] Code folder zipped and submitted on portal
 - [ ] Video link in report appendix, access set to public

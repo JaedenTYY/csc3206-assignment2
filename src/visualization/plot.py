@@ -5,9 +5,10 @@ Route visualization using matplotlib + networkx.
 Renders the 7-node graph and highlights the optimal route.
 """
 
+import os
 import matplotlib.pyplot as plt
 import networkx as nx
-from src.data.graph import NODES, DRIVING_DISTANCE, get_node_label, COST_UNITS
+from src.data.graph import NODES, COST_MATRICES, COST_UNITS, get_node_label, validate_metric
 
 # Approximate relative positions (x, y) for layout
 # Based on Subang Jaya / Klang Valley geography
@@ -32,7 +33,22 @@ NODE_COLORS = {
 }
 
 
-def plot_route(result: dict) -> None:
+def build_route_edge_labels(route: list[str], metric: str) -> dict[tuple[str, str], str]:
+    """Return formatted route-edge labels for the selected metric."""
+    validate_metric(metric)
+    unit = COST_UNITS[metric]
+    matrix = COST_MATRICES[metric]
+    labels = {}
+
+    for u, v in zip(route, route[1:]):
+        value = matrix[u][v]
+        if value is not None:
+            labels[(u, v)] = f"{value:.1f} {unit}"
+
+    return labels
+
+
+def plot_route(result: dict, output_path: str = "assets/route_output.png", show: bool = True) -> None:
     """Render the graph and highlight the solution route."""
     if "error" in result:
         print("No route to visualize.")
@@ -40,16 +56,18 @@ def plot_route(result: dict) -> None:
 
     route = result["route"]
     metric = result["metric"]
+    validate_metric(metric)
     unit = COST_UNITS[metric]
+    matrix = COST_MATRICES[metric]
 
     G = nx.DiGraph()
     G.add_nodes_from(NODES)
 
-    # Add all edges with distance weights
+    # Add all edges with weights for the selected metric.
     for frm in NODES:
         for to in NODES:
-            if frm != to and DRIVING_DISTANCE[frm][to] is not None:
-                G.add_edge(frm, to, weight=DRIVING_DISTANCE[frm][to])
+            if frm != to and matrix[frm][to] is not None:
+                G.add_edge(frm, to, weight=matrix[frm][to])
 
     # Route edges
     route_edges = [(route[i], route[i + 1]) for i in range(len(route) - 1)]
@@ -79,9 +97,8 @@ def plot_route(result: dict) -> None:
     nx.draw_networkx_labels(G, pos, ax=ax, font_size=9,
                             font_color="white", font_weight="bold")
 
-    # Edge distance labels (only on route)
-    edge_labels = {(u, v): f"{DRIVING_DISTANCE[u][v]:.1f}km"
-                   for u, v in route_edges if DRIVING_DISTANCE[u].get(v)}
+    # Edge labels (only on route) for the selected metric.
+    edge_labels = build_route_edge_labels(route, metric)
     nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels,
                                  ax=ax, font_size=7, font_color="#C0392B")
 
@@ -108,6 +125,11 @@ def plot_route(result: dict) -> None:
     ax.axis("off")
 
     plt.tight_layout()
-    plt.savefig("assets/route_output.png", dpi=150, bbox_inches="tight")
-    print("📊 Visualization saved to assets/route_output.png")
-    plt.show()
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    print(f"📊 Visualization saved to {output_path}")
+    if show:
+        plt.show()
+    plt.close(fig)

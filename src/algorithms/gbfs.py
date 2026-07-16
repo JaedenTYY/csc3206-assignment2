@@ -10,7 +10,7 @@ Heuristic: MST of remaining unvisited nodes (same as A*, but g(n) is ignored).
 """
 
 import heapq
-from src.data.graph import NODES, MEMBERS, get_cost, get_neighbours
+from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
 from src.algorithms.astar import heuristic  # Reuse MST heuristic
 
 
@@ -24,6 +24,8 @@ def gbfs(metric: str = "distance") -> dict:
         nodes_expanded : int
         path_costs     : list of (from, to, cost) tuples
     """
+    validate_metric(metric)
+
     start_state = ("SU", frozenset())
     goal_visited = frozenset(MEMBERS)
 

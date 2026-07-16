@@ -31,17 +31,18 @@ $$ f(n) = g(n) + h(n) $$
 - **$g(n)$**: The exact cumulative cost (e.g., distance in km or time in mins) from the start node (`"SU"`) to the current node $n$.
 - **$h(n)$**: The heuristic estimate of the cost from node $n$ to the goal.
 
-### 2.2 The Heuristic: Minimum Spanning Tree (MST)
+### 2.2 The Heuristic: MST-Based Lower Bound
 
 To ensure A* is **optimal**, the heuristic $h(n)$ must be **admissible** (meaning it never overestimates the true cost to reach the goal). We use the **Minimum Spanning Tree (MST)** heuristic calculated using Prim's algorithm.
 
 **How it works:**
 1. Given the current `location` and the set of `remaining_unvisited` members.
-2. We construct a subgraph containing the `current_location` and all `remaining_unvisited` nodes.
-3. We find the Minimum Spanning Tree (MST) of this subgraph using **Prim's Algorithm**.
-4. The sum of the edge weights in the MST serves as $h(n)$.
+2. If there is only one remaining member, the heuristic returns the exact direct cost from the current location to that member.
+3. If multiple members remain, the heuristic adds the cheapest outgoing edge from the current location to any remaining member.
+4. It then computes an MST over the remaining members using the cheaper available direction between each pair as an undirected lower-bound edge.
+5. The outgoing lower bound plus the MST cost serves as $h(n)$.
 
-Since any valid path that visits all remaining nodes must at least form a spanning tree, the MST cost is mathematically guaranteed to be $\le$ the actual shortest path cost. Thus, it is an admissible lower bound.
+Because the route graph is directed and asymmetric, the MST must not use raw directed edges as though they were symmetric. Using the cheaper direction for each undirected pair guarantees that each MST edge is no more expensive than the corresponding directed edge used by any valid route. Therefore, the heuristic remains a lower bound and is empirically tested for every reachable state.
 
 ### 2.3 Python Implementation of A*
 

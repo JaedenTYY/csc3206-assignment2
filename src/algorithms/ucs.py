@@ -8,7 +8,7 @@ Guaranteed optimal. Blind search — explores in all directions.
 """
 
 import heapq
-from src.data.graph import NODES, MEMBERS, get_cost, get_neighbours
+from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
 
 
 def ucs(metric: str = "distance") -> dict:
@@ -21,6 +21,8 @@ def ucs(metric: str = "distance") -> dict:
         nodes_expanded : int
         path_costs     : list of (from, to, cost) tuples
     """
+    validate_metric(metric)
+
     start_state = ("SU", frozenset())
     goal_visited = frozenset(MEMBERS)
 

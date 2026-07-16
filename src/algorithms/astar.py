@@ -1,25 +1,47 @@
 """
 src/algorithms/astar.py
 -----------------------
-A* Search with MST (Prim's) heuristic for the House Visit Tour problem.
+A* Search with an MST-based lower-bound heuristic for the House Visit Tour problem.
 
 State: (location: str, visited: frozenset)
 f(n) = g(n) + h(n)
   g(n) = cumulative cost from start to n
-  h(n) = MST cost over remaining unvisited member nodes (admissible lower bound)
+  h(n) = lower-bound connection cost over remaining unvisited member nodes
 """
 
 import heapq
-from src.data.graph import NODES, MEMBERS, get_cost, get_neighbours
+from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
 
 
-# ── Heuristic: Minimum Spanning Tree (Prim's) ─────────────────────────────────
+# ── Heuristic: Minimum Spanning Tree lower bound ──────────────────────────────
+
+def _undirected_edge_lower_bound(node_a: str, node_b: str, metric: str) -> float:
+    """
+    Return the cheapest available directed edge between two nodes.
+
+    Treating each directed pair as an undirected edge with the cheaper direction
+    gives a lower bound for any directed route that connects the same nodes.
+    """
+    candidates = []
+    for frm, to in ((node_a, node_b), (node_b, node_a)):
+        try:
+            candidates.append(get_cost(frm, to, metric))
+        except ValueError:
+            pass
+
+    if not candidates:
+        raise ValueError(f"No connection between {node_a} and {node_b} for metric '{metric}'")
+
+    return min(candidates)
+
 
 def _prim_mst_cost(nodes: list[str], metric: str) -> float:
     """
-    Compute the MST cost over a set of nodes using Prim's algorithm.
+    Compute an undirected lower-bound MST cost over a set of nodes using Prim's algorithm.
     Returns 0 if fewer than 2 nodes are provided.
     """
+    validate_metric(metric)
+
     if len(nodes) < 2:
         return 0.0
 
@@ -28,37 +50,43 @@ def _prim_mst_cost(nodes: list[str], metric: str) -> float:
 
     while len(in_mst) < len(nodes):
         min_edge = float("inf")
+        next_node = None
         for u in in_mst:
             for v in nodes:
                 if v not in in_mst:
-                    c = get_cost(u, v, metric)
+                    c = _undirected_edge_lower_bound(u, v, metric)
                     if c < min_edge:
                         min_edge = c
+                        next_node = v
+
+        if next_node is None:
+            raise ValueError(f"Unable to connect MST nodes for metric '{metric}'")
+
         total_cost += min_edge
-        # Add the closest node to MST
-        for u in in_mst:
-            for v in nodes:
-                if v not in in_mst and get_cost(u, v, metric) == min_edge:
-                    in_mst.add(v)
-                    break
-            else:
-                continue
-            break
+        in_mst.add(next_node)
 
     return total_cost
 
 
 def heuristic(state: tuple, metric: str) -> float:
     """
-    MST heuristic h(n): minimum cost to connect all remaining unvisited nodes.
-    Includes current location in the MST nodes to estimate cost of leaving it.
+    Admissible lower-bound heuristic h(n).
+
+    For one remaining node, the exact outgoing cost is known. For larger sets,
+    the heuristic uses the cheapest outgoing edge from the current location plus
+    an undirected MST over the remaining residences.
     """
+    validate_metric(metric)
+
     location, visited = state
     remaining = [n for n in MEMBERS if n not in visited]
     if not remaining:
         return 0.0
-    mst_nodes = [location] + remaining
-    return _prim_mst_cost(mst_nodes, metric)
+    if len(remaining) == 1:
+        return get_cost(location, remaining[0], metric)
+
+    min_outgoing = min(get_cost(location, node, metric) for node in remaining)
+    return min_outgoing + _prim_mst_cost(remaining, metric)
 
 
 # ── A* Search ─────────────────────────────────────────────────────────────────
@@ -73,6 +101,8 @@ def astar(metric: str = "distance") -> dict:
         nodes_expanded : int
         path_costs  : list of (from, to, cost) tuples
     """
+    validate_metric(metric)
+
     start_state = ("SU", frozenset())
     goal_visited = frozenset(MEMBERS)
 
