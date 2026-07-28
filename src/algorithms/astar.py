@@ -15,22 +15,51 @@ from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
 
 # ── Heuristic: Minimum Spanning Tree lower bound ──────────────────────────────
 
+_SP_CACHE = {}
+
+def get_shortest_path_cost(u: str, v: str, metric: str) -> float:
+    if (u, v, metric) in _SP_CACHE:
+        return _SP_CACHE[(u, v, metric)]
+        
+    from src.data.graph import NODES
+    dist = {n: float("inf") for n in NODES}
+    dist[u] = 0.0
+    frontier = [(0.0, u)]
+    
+    while frontier:
+        d, curr = heapq.heappop(frontier)
+        if d > dist[curr]:
+            continue
+        for nxt in get_neighbours(curr):
+            try:
+                c = get_cost(curr, nxt, metric)
+                if dist[curr] + c < dist[nxt]:
+                    dist[nxt] = dist[curr] + c
+                    heapq.heappush(frontier, (dist[nxt], nxt))
+            except ValueError:
+                pass
+                
+    for n in NODES:
+        _SP_CACHE[(u, n, metric)] = dist[n]
+        
+    return dist[v]
+
+
 def _undirected_edge_lower_bound(node_a: str, node_b: str, metric: str) -> float:
     """
-    Return the cheapest available directed edge between two nodes.
+    Return the cheapest available shortest-path between two nodes.
 
-    Treating each directed pair as an undirected edge with the cheaper direction
-    gives a lower bound for any directed route that connects the same nodes.
+    Treating each directed shortest path as an undirected edge gives a lower bound 
+    for any directed route that connects the same nodes.
     """
     candidates = []
     for frm, to in ((node_a, node_b), (node_b, node_a)):
-        try:
-            candidates.append(get_cost(frm, to, metric))
-        except ValueError:
-            pass
+        c = get_shortest_path_cost(frm, to, metric)
+        if c != float("inf"):
+            candidates.append(c)
 
     if not candidates:
-        raise ValueError(f"No connection between {node_a} and {node_b} for metric '{metric}'")
+        return float("inf")
 
     return min(candidates)
 
@@ -60,7 +89,7 @@ def _prim_mst_cost(nodes: list[str], metric: str) -> float:
                         next_node = v
 
         if next_node is None:
-            raise ValueError(f"Unable to connect MST nodes for metric '{metric}'")
+            return float("inf")
 
         total_cost += min_edge
         in_mst.add(next_node)
@@ -83,9 +112,9 @@ def heuristic(state: tuple, metric: str) -> float:
     if not remaining:
         return 0.0
     if len(remaining) == 1:
-        return get_cost(location, remaining[0], metric)
+        return get_shortest_path_cost(location, remaining[0], metric)
 
-    min_outgoing = min(get_cost(location, node, metric) for node in remaining)
+    min_outgoing = min(get_shortest_path_cost(location, node, metric) for node in remaining)
     return min_outgoing + _prim_mst_cost(remaining, metric)
 
 
