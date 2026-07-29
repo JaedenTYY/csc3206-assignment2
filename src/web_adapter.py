@@ -2,7 +2,16 @@ import json
 from src.algorithms.astar import astar, heuristic, get_shortest_path_cost, _prim_mst_cost
 from src.algorithms.ucs import ucs
 from src.algorithms.gbfs import gbfs
-from src.data.graph import get_cost, get_neighbours, COST_MATRICES, NODES, MEMBERS
+from src.data.graph import (
+    get_cost,
+    get_neighbours,
+    NODES,
+    MEMBERS,
+    NODE_LOCATIONS,
+    NODE_POSITIONS,
+    DATA_SOURCES,
+    CARBON_FACTOR_KG_CO2E_PER_KM,
+)
 
 def run_algorithm(algorithm: str, metric: str, collect_trace: bool = False) -> str:
     try:
@@ -37,7 +46,14 @@ def get_graph_data(metric: str) -> str:
             for v in get_neighbours(u):
                 c = get_cost(u, v, metric)
                 edges.append({"source": u, "target": v, "cost": c})
-        return json.dumps({"nodes": NODES, "edges": edges})
+        return json.dumps({
+            "nodes": NODES,
+            "edges": edges,
+            "locations": NODE_LOCATIONS,
+            "positions": NODE_POSITIONS,
+            "source": DATA_SOURCES[metric],
+            "carbon_factor": CARBON_FACTOR_KG_CO2E_PER_KM,
+        })
     except Exception as e:
         return json.dumps({"error": str(e)})
 

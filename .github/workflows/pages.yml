@@ -34,24 +34,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements-dev.txt
 
-      - name: Run Python tests and generate JSON
+      - name: Run Python tests
         run: |
           mkdir -p web/public
-          python -m pytest tests/ -v --cov=src --cov-branch > pytest_output.txt || true
-          # Minimal script to output the stats to web/public/test-results.json
-          python -c "
-          import json, datetime
-          with open('web/public/test-results.json', 'w') as f:
-              json.dump({
-                  'total_tests': 25,
-                  'passed_tests': 25,
-                  'failed_tests': 0,
-                  'coverage_percent': 99,
-                  'timestamp': datetime.datetime.now().isoformat(),
-                  'python_versions': ['3.10', '3.12'],
-                  'workflow_status': 'passing'
-              }, f)
-          "
+          python -m pytest tests/ -v \
+            --cov=src \
+            --cov-branch \
+            --cov-report=term-missing \
+            --cov-report=json:/tmp/coverage.json \
+            --junitxml=/tmp/test-results.xml
+
+      - name: Generate verification dashboard data
+        run: |
+          python .github/scripts/generate_test_results.py \
+            /tmp/test-results.xml \
+            /tmp/coverage.json \
+            web/public/test-results.json
 
       - name: Set up Node
         uses: actions/setup-node@v4

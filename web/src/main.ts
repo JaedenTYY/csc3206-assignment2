@@ -91,18 +91,21 @@ document.querySelector<HTMLDivElement>('#app-workspace')!.innerHTML = `
     <!-- Right Column: Visualization & Comparisons -->
     <div class="lg:col-span-8 flex flex-col gap-6">
       
-      <section class="panel-elevated flex flex-col overflow-hidden p-0" style="min-height: 550px;">
+      <section class="panel-elevated flex flex-col overflow-hidden p-0">
         <div class="p-4 border-b border-slate-200 dark:border-brand-border flex justify-between items-center bg-white dark:bg-brand-surface">
-          <h2 class="font-semibold text-slate-800 dark:text-brand-primary flex items-center gap-2">
-            <svg class="w-5 h-5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
-            Graph Visualization
-          </h2>
+          <div>
+            <h2 class="font-semibold text-slate-800 dark:text-brand-primary flex items-center gap-2">
+              <svg class="w-5 h-5 text-brand-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+              Graph Visualization
+            </h2>
+            <p id="graph-data-source" class="mt-1 text-xs text-slate-500 dark:text-brand-secondary">Assignment 1 Table 1</p>
+          </div>
           <div class="flex gap-2">
              <button id="btn-toggle-labels" class="btn-ghost text-xs">Toggle Edge Labels</button>
           </div>
         </div>
-        <div class="flex-grow w-full relative">
-          <div id="cy-container" class="absolute inset-0 bg-slate-50 dark:bg-brand-bg/50"></div>
+        <div id="graph-viewport" class="relative w-full h-[500px] md:h-[560px] min-h-[420px]">
+          <div id="cy-container" class="absolute inset-0 w-full h-full bg-slate-50 dark:bg-brand-bg/50"></div>
           <div id="cy-loading" class="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-brand-bg/80 z-10 backdrop-blur-sm transition-opacity">
             <span class="text-slate-500 dark:text-brand-secondary font-medium font-mono text-sm flex items-center gap-2">
               <div class="w-4 h-4 border-2 border-brand-blue border-t-transparent rounded-full animate-spin"></div>
@@ -157,6 +160,15 @@ initPyodide((status) => {
     
     document.getElementById('control-panel')!.classList.remove('opacity-50', 'pointer-events-none');
     initApp();
+  } else if (status.startsWith('Error')) {
+    statusBadge.classList.remove('bg-brand-amber', 'animate-pulse');
+    statusBadge.classList.add('bg-brand-red');
+    statusText.classList.remove('text-brand-amber');
+    statusText.classList.add('text-brand-red');
+    const cyLoading = document.getElementById('cy-loading');
+    if (cyLoading) {
+      cyLoading.innerHTML = `<span class="text-brand-red font-medium">Failed to initialize Python WASM runtime: ${status}</span>`;
+    }
   }
 });
 
@@ -182,8 +194,8 @@ async function loadTestDashboard() {
         <div class="metric-value text-slate-800 dark:text-brand-primary">${data.coverage_percent}%</div>
       </div>
       <div class="metric-card">
-        <div class="metric-label">Python Support</div>
-        <div class="metric-value text-slate-800 dark:text-brand-primary text-sm mt-1">${data.python_versions.join(' | ')}</div>
+        <div class="metric-label">Deployment Check</div>
+        <div class="metric-value text-slate-800 dark:text-brand-primary text-sm mt-1">Python ${data.python_version}</div>
       </div>
     `;
   } catch (err) {

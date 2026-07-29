@@ -22,7 +22,21 @@ sys.path.insert(0, str(ROOT_DIR))
 from src.algorithms.astar import _prim_mst_cost, astar, heuristic, _undirected_edge_lower_bound
 from src.algorithms.gbfs import gbfs
 from src.algorithms.ucs import ucs
-from src.data.graph import COST_UNITS, MEMBERS, NODES, get_cost, get_neighbours, has_edge, COST_MATRICES
+from src.data.graph import (
+    CARBON_EMISSIONS,
+    CARBON_FACTOR_KG_CO2E_PER_KM,
+    COST_MATRICES,
+    COST_UNITS,
+    DATA_SOURCES,
+    DRIVING_DISTANCE,
+    MEMBERS,
+    NODES,
+    NODE_LOCATIONS,
+    NODE_POSITIONS,
+    get_cost,
+    get_neighbours,
+    has_edge,
+)
 import src.data.graph as graph_module
 
 @pytest.fixture(autouse=True)
@@ -179,6 +193,25 @@ def test_functional_correctness_all_algorithms():
             result2 = algorithm(metric)
             assert result == result2
 
+
+def test_demo_data_is_complete_and_carbon_matches_documented_formula():
+    assert set(NODE_LOCATIONS) == set(NODES)
+    assert set(NODE_POSITIONS) == set(NODES)
+
+    for metric, matrix in COST_MATRICES.items():
+        assert set(matrix) == set(NODES), metric
+        for from_node, row in matrix.items():
+            assert set(row) == set(NODES), (metric, from_node)
+
+    for from_node, row in DRIVING_DISTANCE.items():
+        for to_node, distance in row.items():
+            expected = (
+                None
+                if distance is None
+                else round(distance * CARBON_FACTOR_KG_CO2E_PER_KM, 4)
+            )
+            assert CARBON_EMISSIONS[from_node][to_node] == expected
+
 def test_independent_optimality_verification():
     for metric in METRICS:
         optimal_cost, optimal_paths = dijkstra_optimal_route(metric)
@@ -331,10 +364,28 @@ def test_web_adapter():
     assert "astar" in res_all
     assert "error" in json.loads(wa.run_all_algorithms("invalid"))
     
-    # get_graph_data
-    graph_data = json.loads(wa.get_graph_data("distance"))
-    assert "nodes" in graph_data
-    assert "edges" in graph_data
+    # get_graph_data: the browser must receive the exact shared source data.
+    for metric in METRICS:
+        graph_data = json.loads(wa.get_graph_data(metric))
+        assert graph_data["nodes"] == NODES
+        assert graph_data["locations"] == NODE_LOCATIONS
+        assert graph_data["positions"] == {
+            node: list(position) for node, position in NODE_POSITIONS.items()
+        }
+        assert graph_data["source"] == DATA_SOURCES[metric]
+        assert graph_data["carbon_factor"] == CARBON_FACTOR_KG_CO2E_PER_KM
+
+        edges = {
+            (edge["source"], edge["target"]): edge["cost"]
+            for edge in graph_data["edges"]
+        }
+        expected_edges = {
+            (source, target): get_cost(source, target, metric)
+            for source in NODES
+            for target in get_neighbours(source)
+        }
+        assert edges == expected_edges
+
     assert "error" in json.loads(wa.get_graph_data("invalid"))
     
     # get_project_metadata

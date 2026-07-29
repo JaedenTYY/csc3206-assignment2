@@ -17,6 +17,35 @@ Nodes:
 NODES = ["SU", "M1", "M2", "M3", "M4", "M5", "M6"]
 MEMBERS = ["M1", "M2", "M3", "M4", "M5", "M6"]
 
+# Shared presentation metadata. Both visualizations consume these values so
+# node names and relative positions cannot drift apart.
+NODE_LOCATIONS = {
+    "SU": "Sunway University",
+    "M1": "Tanamera, Subang Jaya",
+    "M2": "USJ Heights, Subang Jaya",
+    "M3": "Bandar Sunway",
+    "M4": "USJ 1",
+    "M5": "Taman Eng Ann, Klang",
+    "M6": "Petaling Jaya",
+}
+
+# Approximate relative positions based on Subang Jaya / Klang Valley geography.
+NODE_POSITIONS = {
+    "SU": (2.0, 2.0),
+    "M1": (3.0, 3.0),
+    "M2": (3.5, 1.8),
+    "M3": (1.8, 1.5),
+    "M4": (3.0, 1.0),
+    "M5": (0.0, 2.0),
+    "M6": (2.5, 0.5),
+}
+
+DATA_SOURCES = {
+    "distance": "Assignment 1 Table 1",
+    "time": "Assignment 1 Table 3",
+    "carbon": "Assignment 1 Table 6",
+}
+
 # ── Table 1: Driving Distance (km) ────────────────────────────────────────────
 # Source: A1 Table 1
 # None = same location / not applicable
@@ -45,14 +74,17 @@ DRIVING_TIME = {
 # ── Table 6: CO₂ Emissions (kg CO₂e) ─────────────────────────────────────────
 # Source: A1 Table 6
 # Formula: distance_km × 0.16272 (UK Gov GHG 2025, Average Petrol Car)
+CARBON_FACTOR_KG_CO2E_PER_KM = 0.16272
 CARBON_EMISSIONS = {
-    "SU": {"SU": None,   "M1": 2.0015, "M2": 1.6923, "M3": 0.2604, "M4": 0.6672, "M5": 3.3195, "M6": 0.5370},
-    "M1": {"SU": None,   "M1": None,   "M2": 1.0740, "M3": 2.2944, "M4": 1.1390, "M5": 2.7988, "M6": 2.1642},
-    "M2": {"SU": None,   "M1": 1.5296, "M2": None,   "M3": 1.6435, "M4": 1.3180, "M5": 2.5547, "M6": 1.7086},
-    "M3": {"SU": None,   "M1": 1.8713, "M2": 1.5296, "M3": None,   "M4": 0.5858, "M5": 3.4334, "M6": 0.8950},
-    "M4": {"SU": None,   "M1": 1.7086, "M2": 1.5296, "M3": 0.8136, "M4": None,   "M5": 4.0355, "M6": 1.0740},
-    "M5": {"SU": None,   "M1": 2.7174, "M2": 2.7174, "M3": 3.2056, "M4": 3.4171, "M5": None,   "M6": 3.3195},
-    "M6": {"SU": None,   "M1": 2.5222, "M2": 1.5133, "M3": 0.7973, "M4": 1.0740, "M5": 3.1080, "M6": None},
+    from_node: {
+        to_node: (
+            None
+            if distance is None
+            else round(distance * CARBON_FACTOR_KG_CO2E_PER_KM, 4)
+        )
+        for to_node, distance in row.items()
+    }
+    for from_node, row in DRIVING_DISTANCE.items()
 }
 
 COST_MATRICES = {
@@ -110,13 +142,16 @@ def has_edge(from_node: str, to_node: str, metric: str = "distance") -> bool:
 
 def get_node_label(node: str) -> str:
     """Return a human-readable label for a node."""
-    labels = {
-        "SU": "Sunway University",
-        "M1": "Jaeden (Tanamera, Subang Jaya)",
-        "M2": "Evan (USJ Heights, Subang Jaya)",
-        "M3": "Wai (Bandar Sunway)",
-        "M4": "Sohom (USJ 1)",
-        "M5": "Raymond (Taman Eng Ann, Klang)",
-        "M6": "Chin (Petaling Jaya)",
+    member_names = {
+        "M1": "Jaeden",
+        "M2": "Evan",
+        "M3": "Wai",
+        "M4": "Sohom",
+        "M5": "Raymond",
+        "M6": "Chin",
     }
-    return labels.get(node, node)
+    if node == "SU":
+        return NODE_LOCATIONS[node]
+    if node in member_names:
+        return f"{member_names[node]} ({NODE_LOCATIONS[node]})"
+    return node

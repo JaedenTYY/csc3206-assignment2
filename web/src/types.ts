@@ -42,4 +42,8 @@ export interface EdgeData {
 export interface GraphData {
   nodes: string[];
   edges: EdgeData[];
+  locations: Record<string, string>;
+  positions: Record<string, [number, number]>;
+  source: string;
+  carbon_factor: number;
 }

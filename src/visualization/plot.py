@@ -8,19 +8,14 @@ Renders the 7-node graph and highlights the optimal route.
 import os
 import matplotlib.pyplot as plt
 import networkx as nx
-from src.data.graph import NODES, COST_MATRICES, COST_UNITS, get_node_label, validate_metric
-
-# Approximate relative positions (x, y) for layout
-# Based on Subang Jaya / Klang Valley geography
-NODE_POSITIONS = {
-    "SU": (2.0, 2.0),
-    "M1": (3.0, 3.0),
-    "M2": (3.5, 1.8),
-    "M3": (1.8, 1.5),
-    "M4": (3.0, 1.0),
-    "M5": (0.0, 2.0),
-    "M6": (2.5, 0.5),
-}
+from src.data.graph import (
+    NODES,
+    NODE_POSITIONS,
+    COST_MATRICES,
+    COST_UNITS,
+    get_node_label,
+    validate_metric,
+)
 
 NODE_COLORS = {
     "SU": "#4A90D9",   # Blue — start

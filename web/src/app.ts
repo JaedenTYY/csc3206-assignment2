@@ -11,6 +11,7 @@ let costChart: Chart | null = null;
 let expandedChart: Chart | null = null;
 let showAllLabels = false;
 let currentMetric = 'distance';
+let graphResizeObserver: ResizeObserver | null = null;
 
 const UNITS: Record<string, string> = {
   distance: 'km',
@@ -47,42 +48,31 @@ function setupEventListeners() {
   
   document.getElementById('metric-select')!.addEventListener('change', async (e) => {
     currentMetric = (e.target as HTMLSelectElement).value;
-    await loadGraphForMetric();
+    try {
+      await loadGraphForMetric();
+    } catch (err: any) {
+      console.error('Failed to load graph:', err);
+    }
   });
 }
 
 async function loadGraphForMetric() {
-  const _data = await getGraphData(currentMetric);
+  const data = await getGraphData(currentMetric);
   const elements: any[] = [];
-  
-  const positions: Record<string, {x: number, y: number}> = {
-    "SU": { x: 300, y: 300 },
-    "M1": { x: 100, y: 150 },
-    "M2": { x: 200, y: 100 },
-    "M3": { x: 400, y: 150 },
-    "M4": { x: 500, y: 250 },
-    "M5": { x: 450, y: 400 },
-    "M6": { x: 150, y: 400 }
-  };
-  
-  const labels: Record<string, string> = {
-    "SU": "Sunway University",
-    "M1": "Tanamera",
-    "M2": "USJ Heights",
-    "M3": "Bandar Sunway",
-    "M4": "USJ 1",
-    "M5": "Taman Eng Ann",
-    "M6": "Petaling Jaya"
-  };
-  
-  _data.nodes.forEach(node => {
+
+  data.nodes.forEach(node => {
+    const [relativeX, relativeY] = data.positions[node];
     elements.push({
-      data: { id: node, label: labels[node] || node },
-      position: positions[node] || { x: Math.random()*500, y: Math.random()*500 }
+      data: { id: node, label: `${node} · ${data.locations[node]}` },
+      // Cytoscape's y-axis increases downwards, unlike the shared Python plot.
+      position: {
+        x: 80 + relativeX * 130,
+        y: 80 + (3 - relativeY) * 130,
+      }
     });
   });
   
-  _data.edges.forEach(edge => {
+  data.edges.forEach(edge => {
     elements.push({
       data: { 
         id: `${edge.source}-${edge.target}`, 
@@ -97,6 +87,18 @@ async function loadGraphForMetric() {
   cy.elements().remove();
   cy.add(elements);
   updateLabelVisibility();
+
+  const source = document.getElementById('graph-data-source');
+  if (source) {
+    source.textContent = currentMetric === 'carbon'
+      ? `${data.source} · ${data.carbon_factor} kg CO₂e/km`
+      : data.source;
+  }
+
+  requestAnimationFrame(() => {
+    cy.resize();
+    cy.fit(cy.elements(), 48);
+  });
 }
 
 function applyCytoscapeTheme(isDark: boolean) {
@@ -132,9 +134,10 @@ function applyCytoscapeTheme(isDark: boolean) {
 
 async function initCytoscape() {
   const isDark = document.documentElement.classList.contains('dark');
+  const container = document.getElementById('cy-container')!;
   
   cy = cytoscape({
-    container: document.getElementById('cy-container'),
+    container,
     style: [
       {
         selector: 'node',
@@ -216,8 +219,25 @@ async function initCytoscape() {
   });
   
   applyCytoscapeTheme(isDark);
-  await loadGraphForMetric();
-  document.getElementById('cy-loading')!.style.display = 'none';
+  try {
+    await loadGraphForMetric();
+    document.getElementById('cy-loading')!.style.display = 'none';
+  } catch (err: any) {
+    document.getElementById('cy-loading')!.innerHTML = `<span class="text-brand-red font-medium">Error loading graph: ${err.message}</span>`;
+  }
+
+  graphResizeObserver?.disconnect();
+  graphResizeObserver = new ResizeObserver(() => {
+    requestAnimationFrame(() => {
+      if (cy && !cy.destroyed()) {
+        cy.resize();
+        if (cy.elements().length > 0) {
+          cy.fit(cy.elements(), 48);
+        }
+      }
+    });
+  });
+  graphResizeObserver.observe(container);
   
   cy.on('mouseover', 'edge', (e) => {
     e.target.addClass('show-label');

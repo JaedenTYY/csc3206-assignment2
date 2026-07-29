@@ -14,29 +14,34 @@ let pyodideReadyPromise: Promise<void> | null = null;
 let pyodide: any = null;
 
 async function init() {
-  self.postMessage({ type: 'STATUS', payload: 'Loading Python runtime...' });
-  pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/' });
-  
-  self.postMessage({ type: 'STATUS', payload: 'Loading search algorithms...' });
-  pyodide.FS.mkdir("src");
-  pyodide.FS.mkdir("src/algorithms");
-  pyodide.FS.mkdir("src/data");
-  
-  pyodide.FS.writeFile("src/__init__.py", initPy);
-  pyodide.FS.writeFile("src/web_adapter.py", webAdapterPy);
-  pyodide.FS.writeFile("src/algorithms/__init__.py", algInitPy);
-  pyodide.FS.writeFile("src/algorithms/astar.py", astarPy);
-  pyodide.FS.writeFile("src/algorithms/ucs.py", ucsPy);
-  pyodide.FS.writeFile("src/algorithms/gbfs.py", gbfsPy);
-  pyodide.FS.writeFile("src/data/__init__.py", dataInitPy);
-  pyodide.FS.writeFile("src/data/graph.py", graphPy);
-  
-  await pyodide.runPythonAsync(`
+  try {
+    self.postMessage({ type: 'STATUS', payload: 'Loading Python runtime...' });
+    pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/' });
+    
+    self.postMessage({ type: 'STATUS', payload: 'Loading search algorithms...' });
+    pyodide.FS.mkdir("src");
+    pyodide.FS.mkdir("src/algorithms");
+    pyodide.FS.mkdir("src/data");
+    
+    pyodide.FS.writeFile("src/__init__.py", initPy);
+    pyodide.FS.writeFile("src/web_adapter.py", webAdapterPy);
+    pyodide.FS.writeFile("src/algorithms/__init__.py", algInitPy);
+    pyodide.FS.writeFile("src/algorithms/astar.py", astarPy);
+    pyodide.FS.writeFile("src/algorithms/ucs.py", ucsPy);
+    pyodide.FS.writeFile("src/algorithms/gbfs.py", gbfsPy);
+    pyodide.FS.writeFile("src/data/__init__.py", dataInitPy);
+    pyodide.FS.writeFile("src/data/graph.py", graphPy);
+    
+    await pyodide.runPythonAsync(`
 import sys
 sys.path.append(".")
 import src.web_adapter as web_adapter
-  `);
-  self.postMessage({ type: 'STATUS', payload: 'Ready' });
+    `);
+    self.postMessage({ type: 'STATUS', payload: 'Ready' });
+  } catch (err: any) {
+    self.postMessage({ type: 'STATUS', payload: `Error: ${err.message}` });
+    self.postMessage({ id: -1, type: 'ERROR', payload: err.message || 'Failed to initialize Python runtime' });
+  }
 }
 
 pyodideReadyPromise = init();
