@@ -1,3 +1,160 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --color-brand-bg: #030712;
+  --color-brand-surface: #0B1220;
+  --color-brand-elevated: #111827;
+  --color-brand-border: rgba(148, 163, 184, 0.16);
+  --color-brand-primary: #F8FAFC;
+  --color-brand-secondary: #94A3B8;
+  --color-brand-muted: #64748B;
+  
+  --color-brand-blue: #3B82F6;
+  --color-brand-cyan: #22D3EE;
+  --color-brand-emerald: #10B981;
+  --color-brand-violet: #8B5CF6;
+  --color-brand-amber: #F59E0B;
+  --color-brand-red: #F87171;
+
+  --font-sans: "Inter", sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-primary font-sans antialiased transition-colors duration-300;
+  }
+  
+  /* Subtle radial glow background for dark mode */
+  .dark body {
+    background-image: 
+      radial-gradient(circle at 50% -20%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at -20% 50%, rgba(139, 92, 246, 0.05) 0%, transparent 40%),
+      linear-gradient(to bottom, transparent, rgba(3, 7, 18, 1)),
+      linear-gradient(rgba(148, 163, 184, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.03) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+    background-position: center, center, center, center, center;
+    background-attachment: fixed;
+  }
+
+  /* Grid pattern for light mode */
+  .light body {
+    background-color: #f8fafc;
+    background-image:
+      linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+    background-size: 40px 40px;
+    background-position: center center;
+    background-attachment: fixed;
+    color: #0f172a;
+  }
+}
+
+@layer components {
+  /* Panels */
+  .panel {
+    @apply bg-white rounded-xl border border-slate-200 p-5 shadow-sm transition-colors;
+  }
+  .dark .panel {
+    @apply bg-brand-surface border-brand-border;
+  }
+  
+  .panel-elevated {
+    @apply bg-slate-50 rounded-xl border border-slate-200 p-5 shadow transition-colors;
+  }
+  .dark .panel-elevated {
+    @apply bg-brand-elevated border-brand-border;
+  }
+  
+  /* Buttons */
+  .btn-primary {
+    @apply flex-1 bg-brand-blue hover:bg-blue-600 text-white py-2 px-4 rounded-md font-medium transition-all focus:outline-none focus:ring-2 focus:ring-brand-blue/50 focus:ring-offset-2;
+  }
+  .dark .btn-primary {
+    @apply focus:ring-offset-brand-bg;
+  }
+  
+  .btn-secondary {
+    @apply flex-1 bg-brand-violet hover:bg-violet-600 text-white py-2 px-4 rounded-md font-medium transition-all focus:outline-none focus:ring-2 focus:ring-brand-violet/50 focus:ring-offset-2;
+  }
+  .dark .btn-secondary {
+    @apply focus:ring-offset-brand-bg;
+  }
+  
+  .btn-neutral {
+    @apply w-full bg-slate-800 hover:bg-slate-700 text-white border border-transparent py-2 px-4 rounded-md font-medium transition-all focus:outline-none focus:ring-2 focus:ring-slate-500/50;
+  }
+  .dark .btn-neutral {
+    @apply bg-brand-elevated hover:bg-slate-800 border-brand-border;
+  }
+  
+  .btn-ghost {
+    @apply px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200 transition-colors focus:outline-none;
+  }
+  .dark .btn-ghost {
+    @apply bg-brand-elevated hover:bg-slate-800 text-brand-primary border-brand-border;
+  }
+  
+  /* Form Controls */
+  .input-control {
+    @apply w-full rounded-md border-slate-300 bg-white text-slate-900 shadow-sm p-2 border focus:ring-brand-blue focus:border-brand-blue transition-colors;
+  }
+  .dark .input-control {
+    @apply border-brand-border bg-brand-bg text-brand-primary;
+  }
+  
+  /* Text */
+  .section-title {
+    @apply text-xl md:text-2xl font-bold mb-4 text-slate-900 border-b border-slate-200 pb-2;
+  }
+  .dark .section-title {
+    @apply text-brand-primary border-brand-border;
+  }
+  
+  /* Metrics */
+  .metric-card {
+    @apply bg-slate-50 p-3 rounded-lg border border-slate-200;
+  }
+  .dark .metric-card {
+    @apply bg-brand-elevated border-brand-border;
+  }
+  
+  .metric-label {
+    @apply text-xs text-slate-500 uppercase font-bold tracking-wider mb-1;
+  }
+  .dark .metric-label {
+    @apply text-brand-secondary;
+  }
+  
+  .metric-value {
+    @apply font-mono font-bold text-lg text-slate-800;
+  }
+  .dark .metric-value {
+    @apply text-brand-primary;
+  }
+  
+  /* Code & Formulas */
+  .code-block {
+    @apply font-mono text-sm bg-slate-100 text-slate-800 p-2 rounded border border-slate-200;
+  }
+  .dark .code-block {
+    @apply bg-brand-elevated text-brand-primary border-brand-border;
+  }
+  
+  .formula-chip {
+    @apply font-mono bg-slate-100 border border-slate-200 px-2 py-1 rounded text-sm;
+  }
+  .dark .formula-chip {
+    @apply bg-brand-elevated border-brand-border;
+  }
+  
+  /* Nav */
+  .glass-nav {
+    @apply sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200;
+  }
+  .dark .glass-nav {
+    @apply bg-brand-bg/80 border-brand-border;
+  }
+}

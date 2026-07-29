@@ -7,15 +7,15 @@ import graphPy from '../../src/data/graph.py?raw';
 import algInitPy from '../../src/algorithms/__init__.py?raw';
 import dataInitPy from '../../src/data/__init__.py?raw';
 
-declare let loadPyodide: any;
+// @ts-ignore
+import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.mjs';
+
 let pyodideReadyPromise: Promise<void> | null = null;
 let pyodide: any = null;
 
-(self as any).importScripts("https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js");
-
 async function init() {
   self.postMessage({ type: 'STATUS', payload: 'Loading Python runtime...' });
-  pyodide = await loadPyodide();
+  pyodide = await loadPyodide({ indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.25.0/full/' });
   
   self.postMessage({ type: 'STATUS', payload: 'Loading search algorithms...' });
   pyodide.FS.mkdir("src");
