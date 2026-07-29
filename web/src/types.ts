@@ -14,6 +14,7 @@ export interface TraceStep {
   frontierSizeAfter: number;
   generatedSuccessors: number;
   routeSoFar: string[];
+  frontierLocations?: string[];
 }
 
 export interface PathCost {

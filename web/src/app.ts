@@ -400,6 +400,14 @@ function setTraceStep(index: number) {
   // Update graph
   cy.elements().removeClass('route current visited show-label frontier');
   
+  if (step.frontierLocations) {
+    for (const node of step.frontierLocations) {
+      if (node !== step.state.location) {
+        cy.getElementById(node).addClass('frontier');
+      }
+    }
+  }
+  
   for (const node of step.state.visited) {
     cy.getElementById(node).addClass('visited');
   }

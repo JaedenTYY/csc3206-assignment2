@@ -79,6 +79,7 @@ def ucs(metric: str = "distance", collect_trace: bool = False) -> dict:
             }
             if collect_trace:
                 current_trace["frontierSizeAfter"] = len(frontier)
+                current_trace["frontierLocations"] = list(set([item[2][0] for item in frontier]))
                 traces.append(current_trace)
                 res["trace"] = traces
             return res
@@ -97,6 +98,7 @@ def ucs(metric: str = "distance", collect_trace: bool = False) -> dict:
         if collect_trace:
             current_trace["frontierSizeAfter"] = len(frontier)
             current_trace["generatedSuccessors"] = generated_successors
+            current_trace["frontierLocations"] = list(set([item[2][0] for item in frontier]))
             traces.append(current_trace)
 
     return {"error": "No solution found"}
