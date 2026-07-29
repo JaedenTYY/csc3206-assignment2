@@ -121,7 +121,7 @@ def heuristic(state: tuple, metric: str) -> float:
 
 # ── A* Search ─────────────────────────────────────────────────────────────────
 
-def astar(metric: str = "distance") -> dict:
+def astar(metric: str = "distance", collect_trace: bool = False) -> dict:
     """
     Run A* Search on the House Visit Tour problem.
 
@@ -146,17 +146,35 @@ def astar(metric: str = "distance") -> dict:
     # explored: state → best g(n) seen
     explored = {}
     nodes_expanded = 0
+    step = 0
+    traces = []
 
     while frontier:
+        frontier_size_before = len(frontier)
         f, g, _, state, path = heapq.heappop(frontier)
 
         location, visited = state
 
-        # Skip if we've already found a cheaper path to this state
         if state in explored and explored[state] <= g:
             continue
         explored[state] = g
         nodes_expanded += 1
+        step += 1
+
+        h = f - g
+        current_trace = None
+        if collect_trace:
+            current_trace = {
+                "step": step,
+                "state": {"location": location, "visited": list(visited)},
+                "g": g,
+                "h": h,
+                "f": f,
+                "priority": f,
+                "frontierSizeBefore": frontier_size_before,
+                "generatedSuccessors": 0,
+                "routeSoFar": path
+            }
 
         # Goal check
         if visited == goal_visited:
@@ -164,7 +182,7 @@ def astar(metric: str = "distance") -> dict:
             for i in range(len(path) - 1):
                 c = get_cost(path[i], path[i + 1], metric)
                 path_costs.append((path[i], path[i + 1], c))
-            return {
+            res = {
                 "algorithm": "A* Search",
                 "metric": metric,
                 "route": path,
@@ -172,8 +190,14 @@ def astar(metric: str = "distance") -> dict:
                 "nodes_expanded": nodes_expanded,
                 "path_costs": path_costs,
             }
+            if collect_trace:
+                current_trace["frontierSizeAfter"] = len(frontier)
+                traces.append(current_trace)
+                res["trace"] = traces
+            return res
 
         # Expand neighbours
+        generated_successors = 0
         for neighbour in get_neighbours(location):
             edge_cost = get_cost(location, neighbour, metric)
             new_g = g + edge_cost
@@ -184,5 +208,11 @@ def astar(metric: str = "distance") -> dict:
                 new_h = heuristic(new_state, metric)
                 new_f = new_g + new_h
                 heapq.heappush(frontier, (new_f, new_g, next(counter), new_state, path + [neighbour]))
+                generated_successors += 1
+
+        if collect_trace:
+            current_trace["frontierSizeAfter"] = len(frontier)
+            current_trace["generatedSuccessors"] = generated_successors
+            traces.append(current_trace)
 
     return {"error": "No solution found"}

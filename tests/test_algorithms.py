@@ -294,7 +294,66 @@ def test_no_solution_branch(monkeypatch):
     for name, algo in ALL_ALGORITHMS:
         assert algo("distance") == {"error": "No solution found"}
 
-# CLI execution tests coverage for main.py
+def test_trace_collection_all():
+    from src.algorithms.astar import astar
+    from src.algorithms.ucs import ucs
+    from src.algorithms.gbfs import gbfs
+    
+    for alg in (astar, ucs, gbfs):
+        res = alg("distance", collect_trace=True)
+        assert "trace" in res
+        assert len(res["trace"]) > 0
+        first_step = res["trace"][0]
+        assert "step" in first_step
+        assert "g" in first_step
+        assert "h" in first_step
+        assert "f" in first_step
+        assert "priority" in first_step
+        assert "frontierSizeBefore" in first_step
+        assert "generatedSuccessors" in first_step
+        assert "routeSoFar" in first_step
+
+def test_web_adapter():
+    import json
+    import src.web_adapter as wa
+    
+    # run_algorithm
+    res_str = wa.run_algorithm("astar", "distance", collect_trace=True)
+    res = json.loads(res_str)
+    assert "route" in res
+    assert "trace" in res
+    
+    assert "error" in json.loads(wa.run_algorithm("invalid", "distance"))
+    assert "error" in json.loads(wa.run_algorithm("astar", "invalid"))
+    
+    # run_all_algorithms
+    res_all = json.loads(wa.run_all_algorithms("distance"))
+    assert "astar" in res_all
+    assert "error" in json.loads(wa.run_all_algorithms("invalid"))
+    
+    # get_graph_data
+    graph_data = json.loads(wa.get_graph_data("distance"))
+    assert "nodes" in graph_data
+    assert "edges" in graph_data
+    assert "error" in json.loads(wa.get_graph_data("invalid"))
+    
+    # get_project_metadata
+    meta = json.loads(wa.get_project_metadata())
+    assert "algorithms" in meta
+    
+    # get_heuristic_data
+    h_data = json.loads(wa.get_heuristic_data("SU", ["SU"], "distance"))
+    assert "h" in h_data
+    
+    h_data_single = json.loads(wa.get_heuristic_data("SU", [n for n in MEMBERS if n != "M1"], "distance"))
+    assert "h" in h_data_single
+    
+    h_data_none = json.loads(wa.get_heuristic_data("M1", MEMBERS, "distance"))
+    assert h_data_none["h"] == 0.0
+    
+    # invalid heuristic
+    assert "error" in json.loads(wa.get_heuristic_data("SU", ["SU"], "invalid"))
+
 def test_cli_subprocess_execution():
     commands = [
         ["src/main.py"],

@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>House Visit Tour Using A* Search</title>
+  </head>
+  <body class="bg-slate-50 text-slate-900 font-sans antialiased">
+    <div id="app" class="min-h-screen flex flex-col"></div>
+    
+    <!-- Explanations and Static Content -->
+    <div class="max-w-7xl mx-auto w-full p-6 grid gap-6 grid-cols-1 mb-12">
+      
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:p-8">
+        <h2 class="text-2xl font-bold mb-4 text-slate-800 border-b pb-2">How the Algorithms Expand States</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h3 class="font-bold text-lg text-slate-700">Uniform-Cost Search</h3>
+            <code class="block mt-2 bg-slate-200 p-2 rounded text-sm text-slate-800">priority = g(n)</code>
+            <p class="text-sm mt-3 text-slate-600">Explores based strictly on accumulated cost. Guaranteed optimal, but expands many states blindly in all directions.</p>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h3 class="font-bold text-lg text-slate-700">Greedy Best-First</h3>
+            <code class="block mt-2 bg-slate-200 p-2 rounded text-sm text-slate-800">priority = h(n)</code>
+            <p class="text-sm mt-3 text-slate-600">Explores based strictly on estimated remaining cost. Extremely fast, but ignores distance already traveled. Not guaranteed optimal.</p>
+          </div>
+          <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+            <h3 class="font-bold text-lg text-slate-700">A* Search</h3>
+            <code class="block mt-2 bg-slate-200 p-2 rounded text-sm text-slate-800">priority = g(n) + h(n)</code>
+            <p class="text-sm mt-3 text-slate-600">Balances both costs. Expands fewer states than UCS while still guaranteeing the mathematically optimal route.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:p-8">
+        <h2 class="text-2xl font-bold mb-4 text-slate-800 border-b pb-2">Testing & Verification Dashboard</h2>
+        <div id="test-dashboard" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+           <!-- Loaded from JSON -->
+           <div class="text-slate-500 italic">Loading test artifact...</div>
+        </div>
+        <div class="text-sm text-slate-600 space-y-2">
+          <p>The Python implementation is continuously verified through GitHub Actions against strict test criteria:</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong>Functional Correctness:</strong> Validates open tours, node constraints, and matrix costs.</li>
+            <li><strong>Composite-State Dijkstra Oracle:</strong> Independently verifies A* optimality over the (location, visited) search space.</li>
+            <li><strong>Heuristic Admissibility:</strong> Confirms the MST closure mathematically underbounds true remaining cost.</li>
+            <li><strong>Robustness:</strong> Ensures graceful fallbacks for disconnected metrics without crashing.</li>
+          </ul>
+        </div>
+      </section>
+      
+      <section class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 lg:p-8">
+        <h2 class="text-2xl font-bold mb-4 text-slate-800 border-b pb-2">Problem Formulation</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h3 class="font-semibold text-lg text-slate-700 mb-2">State Representation</h3>
+            <p class="text-sm text-slate-600 mb-4">State is a tuple <code>(Location, VisitedSet)</code>. There are 193 consistent reachable states in the metric tour, forming a subset of the 448 theoretically possible (7 × 2⁶) pairs.</p>
+            
+            <h3 class="font-semibold text-lg text-slate-700 mb-2">Initial & Goal States</h3>
+            <p class="text-sm text-slate-600 mb-4"><strong>Start:</strong> <code>("SU", {})</code><br><strong>Goal:</strong> <code>(L, {M1..M6})</code> where returning to SU is not required.</p>
+          </div>
+          <div>
+            <h3 class="font-semibold text-lg text-slate-700 mb-2">Assumptions & Limitations</h3>
+            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+              <li>Static snapshot environment (no live traffic).</li>
+              <li>Deterministic graph costs.</li>
+              <li>Single vehicle routing.</li>
+              <li>Carbon emission acts as a linear proxy distance.</li>
+            </ul>
+            <h3 class="font-semibold text-lg text-slate-700 mt-4 mb-2">Future Improvements</h3>
+            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+              <li>Multi-objective composite optimization.</li>
+              <li>Time-window constraints for members.</li>
+              <li>Geospatial Mapbox/Leaflet overlays.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+    </div>
+    
+    <script type="module" src="/src/main.ts"></script>
+    <script>
+      fetch('/test-results.json')
+        .then(res => res.json())
+        .then(data => {
+          document.getElementById('test-dashboard').innerHTML = `
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Status</div>
+              <div class="text-xl font-bold text-green-600 flex items-center">
+                <svg class="w-5 h-5 mr-1" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                ${data.workflow_status.toUpperCase()}
+              </div>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Tests Passed</div>
+              <div class="text-xl font-bold text-slate-800">${data.passed_tests} / ${data.total_tests}</div>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Branch Coverage</div>
+              <div class="text-xl font-bold text-slate-800">${data.coverage_percent}%</div>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+              <div class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Python Support</div>
+              <div class="text-sm font-bold text-slate-800 mt-1">${data.python_versions.join(' | ')}</div>
+            </div>
+          `;
+        })
+        .catch(() => {
+          document.getElementById('test-dashboard').innerHTML = '<div class="col-span-4 text-red-500 text-sm">Could not load test results JSON. It will be generated during CI deployment.</div>';
+        });
+    </script>
+  </body>
+</html>

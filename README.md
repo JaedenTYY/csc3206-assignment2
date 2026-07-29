@@ -38,6 +38,24 @@ Design a **house visit tour** starting from Sunway University that visits the re
 
 ---
 
+### Web Dashboard Development (Local)
+
+To run the interactive GitHub Pages demo locally:
+```bash
+cd web
+npm install
+npm run dev
+```
+
+To build for production:
+```bash
+npm run build
+```
+
+Deployment is handled automatically by GitHub Actions (`.github/workflows/pages.yml`) upon pushing to the `main` branch.
+
+## Evaluation Goals
+
 ## 🗺️ Locations
 
 | Node | Member | Address |

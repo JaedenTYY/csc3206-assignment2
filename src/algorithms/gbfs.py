@@ -15,7 +15,7 @@ from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
 from src.algorithms.astar import heuristic  # Reuse MST heuristic
 
 
-def gbfs(metric: str = "distance") -> dict:
+def gbfs(metric: str = "distance", collect_trace: bool = False) -> dict:
     """
     Run Greedy Best-First Search on the House Visit Tour problem.
 
@@ -39,8 +39,11 @@ def gbfs(metric: str = "distance") -> dict:
 
     visited_states = set()
     nodes_expanded = 0
+    step = 0
+    traces = []
 
     while frontier:
+        frontier_size_before = len(frontier)
         h, _, state, g, path = heapq.heappop(frontier)
         location, visited = state
 
@@ -48,6 +51,21 @@ def gbfs(metric: str = "distance") -> dict:
             continue
         visited_states.add(state)
         nodes_expanded += 1
+        step += 1
+        
+        current_trace = None
+        if collect_trace:
+            current_trace = {
+                "step": step,
+                "state": {"location": location, "visited": list(visited)},
+                "g": g,
+                "h": h,
+                "f": h,
+                "priority": h,
+                "frontierSizeBefore": frontier_size_before,
+                "generatedSuccessors": 0,
+                "routeSoFar": path
+            }
 
         # Goal check
         if visited == goal_visited:
@@ -55,7 +73,7 @@ def gbfs(metric: str = "distance") -> dict:
             for i in range(len(path) - 1):
                 c = get_cost(path[i], path[i + 1], metric)
                 path_costs.append((path[i], path[i + 1], c))
-            return {
+            res = {
                 "algorithm": "Greedy Best-First Search",
                 "metric": metric,
                 "route": path,
@@ -63,7 +81,13 @@ def gbfs(metric: str = "distance") -> dict:
                 "nodes_expanded": nodes_expanded,
                 "path_costs": path_costs,
             }
+            if collect_trace:
+                current_trace["frontierSizeAfter"] = len(frontier)
+                traces.append(current_trace)
+                res["trace"] = traces
+            return res
 
+        generated_successors = 0
         for neighbour in get_neighbours(location):
             edge_cost = get_cost(location, neighbour, metric)
             new_g = g + edge_cost
@@ -73,5 +97,11 @@ def gbfs(metric: str = "distance") -> dict:
             if new_state not in visited_states:
                 new_h = heuristic(new_state, metric)
                 heapq.heappush(frontier, (new_h, next(counter), new_state, new_g, path + [neighbour]))
+                generated_successors += 1
 
+        if collect_trace:
+            current_trace["frontierSizeAfter"] = len(frontier)
+            current_trace["generatedSuccessors"] = generated_successors
+            traces.append(current_trace)
+            
     return {"error": "No solution found"}
