@@ -8,10 +8,10 @@ Nodes:
     SU  = Sunway University (start)
     M1  = Jaeden   (Tanamera, Subang Jaya)
     M2  = Evan     (USJ Heights, Subang Jaya)
-    M3  = Wai      (Sunway House Waterfront, Bandar Sunway)
-    M4  = Sohom    (Edumetro, USJ1)
+    M3  = Wai      (Bandar Sunway)
+    M4  = Sohom    (USJ 1)
     M5  = Raymond  (Taman Eng Ann, Klang)
-    M6  = Chin     (Yolo Signature Suites, Petaling Jaya)
+    M6  = Chin     (Petaling Jaya)
 """
 
 NODES = ["SU", "M1", "M2", "M3", "M4", "M5", "M6"]
@@ -114,9 +114,9 @@ def get_node_label(node: str) -> str:
         "SU": "Sunway University",
         "M1": "Jaeden (Tanamera, Subang Jaya)",
         "M2": "Evan (USJ Heights, Subang Jaya)",
-        "M3": "Wai (Sunway House Waterfront)",
-        "M4": "Sohom (Edumetro, USJ1)",
+        "M3": "Wai (Bandar Sunway)",
+        "M4": "Sohom (USJ 1)",
         "M5": "Raymond (Taman Eng Ann, Klang)",
-        "M6": "Chin (Yolo Signature Suites, PJ)",
+        "M6": "Chin (Petaling Jaya)",
     }
     return labels.get(node, node)

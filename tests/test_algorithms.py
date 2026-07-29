@@ -200,9 +200,10 @@ def test_heuristic_no_unvisited_residences():
         assert heuristic(state, metric) == 0.0
         
 def test_heuristic_one_unvisited_residence():
+    from src.algorithms.astar import get_shortest_path_cost
     for metric in METRICS:
         state = ("M2", frozenset(m for m in MEMBERS if m != "M5"))
-        assert heuristic(state, metric) == get_cost("M2", "M5", metric)
+        assert heuristic(state, metric) == get_shortest_path_cost("M2", "M5", metric)
         
 def test_heuristic_properties():
     for metric in METRICS:
@@ -217,20 +218,23 @@ def test_heuristic_properties():
             assert loc == loc_copy and vis == vis_copy
 
 def test_heuristic_metric_independence(monkeypatch):
+    from src.algorithms.astar import _SP_CACHE
     state = ("SU", frozenset())
     orig_carbon = heuristic(state, "carbon")
     orig_distance = heuristic(state, "distance")
     
-    # Store original and set a new one
-    orig_m1_m2_carbon = COST_MATRICES["carbon"]["M1"]["M2"]
-    monkeypatch.setitem(COST_MATRICES["carbon"]["M1"], "M2", 999.0)
+    monkeypatch.setitem(
+        COST_MATRICES["carbon"]["M1"],
+        "M2",
+        COST_MATRICES["carbon"]["M1"]["M2"] * 10,
+    )
+    _SP_CACHE.clear()
     
     new_carbon = heuristic(state, "carbon")
     new_distance = heuristic(state, "distance")
     
+    assert new_carbon != orig_carbon
     assert new_distance == orig_distance
-    if orig_carbon != new_carbon:
-        assert new_carbon != orig_carbon
 
 def test_heuristic_admissibility():
     for metric in METRICS:
@@ -291,6 +295,39 @@ def test_no_solution_branch(monkeypatch):
         assert algo("distance") == {"error": "No solution found"}
 
 # CLI execution tests coverage for main.py
+def test_cli_subprocess_execution():
+    commands = [
+        ["src/main.py"],
+        ["src/main.py", "--cost", "time"],
+        ["src/main.py", "--cost", "carbon"],
+        ["src/main.py", "--compare"],
+    ]
+    for cmd in commands:
+        res = subprocess.run([sys.executable, *cmd], capture_output=True, text=True, cwd=ROOT_DIR)
+        assert res.returncode == 0
+        assert "Algorithm" in res.stdout
+        assert "Total Cost" in res.stdout
+
+def test_cli_subprocess_help():
+    res = subprocess.run([sys.executable, "src/main.py", "--help"], capture_output=True, text=True, cwd=ROOT_DIR)
+    assert res.returncode == 0
+    assert "usage:" in res.stdout.lower()
+
+def test_cli_subprocess_invalid_cost():
+    res = subprocess.run([sys.executable, "src/main.py", "--cost", "invalid"], capture_output=True, text=True, cwd=ROOT_DIR)
+    assert res.returncode != 0
+    assert "invalid choice" in res.stderr
+
+def test_cli_subprocess_visualize(tmp_path):
+    env = os.environ.copy()
+    env["MPLBACKEND"] = "Agg"
+    res = subprocess.run([sys.executable, str(ROOT_DIR / "src/main.py"), "--visualize"], capture_output=True, text=True, cwd=tmp_path, env=env)
+    assert res.returncode == 0
+    assert "Visualization saved" in res.stdout
+    out_file = tmp_path / "assets" / "route_output.png"
+    assert out_file.exists()
+    assert out_file.stat().st_size > 0
+
 def test_main_cli_execution_and_coverage(monkeypatch, capsys, tmp_path):
     from src.main import main, print_result
     
@@ -298,16 +335,6 @@ def test_main_cli_execution_and_coverage(monkeypatch, capsys, tmp_path):
     main()
     out, _ = capsys.readouterr()
     assert "COMPARISON TABLE" in out
-    
-    # Test --visualize
-    monkeypatch.setattr(sys, "argv", ["main.py", "--visualize"])
-    matplotlib.use("Agg", force=True)
-    
-    # ensure it saves somewhere safe instead of cluttering workspace if we want
-    # but the assignment expects it to create assets/route_output.png which is fine
-    main()
-    out, _ = capsys.readouterr()
-    assert "Visualization saved" in out or "error" not in out
     
     # test error condition in print_result
     print_result({"error": "test error"}, "km")

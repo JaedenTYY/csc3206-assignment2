@@ -130,6 +130,6 @@ def plot_route(result: dict, output_path: str = "assets/route_output.png", show:
         os.makedirs(output_dir, exist_ok=True)
     plt.savefig(output_path, dpi=150, bbox_inches="tight")
     print(f"📊 Visualization saved to {output_path}")
-    if show:
+    if show and plt.get_backend().lower() != "agg":
         plt.show()
     plt.close(fig)

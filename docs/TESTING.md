@@ -8,7 +8,7 @@ The test suite in `tests/test_algorithms.py` verifies the required behavior for 
 
 - **Route structure**: `test_all_routes_have_valid_member_structure()` checks that every route starts at `SU`, contains only valid nodes, has exactly 7 nodes, and visits each member exactly once.
 - **Cost breakdown**: `test_total_cost_and_path_cost_breakdown_are_consistent()` checks that every `path_costs` edge matches consecutive route nodes and that the edge-cost sum equals `total_cost`.
-- **Independent optimality**: `test_astar_and_ucs_match_independent_bruteforce_optimum()` enumerates all `6! = 720` possible member orders for distance, time, and carbon, then confirms A* and UCS match the true minimum.
+- **Independent optimality**: `test_astar_and_ucs_match_independent_dijkstra_optimum()` uses an exact Dijkstra oracle over the composite `(location, visited)` state space to verify A* and UCS find the true minimum, naturally allowing revisits if necessary.
 - **Efficiency comparison**: `test_astar_expands_no_more_states_than_ucs()` confirms A* expands no more states than UCS for every metric.
 
 ## 2. Robustness Tests
@@ -20,7 +20,7 @@ The suite also checks invalid or unusual inputs:
 
 ## 3. Heuristic Tests
 
-A* depends on an admissible MST-based lower-bound heuristic. The tests verify:
+A* depends on an admissible MST-based lower-bound heuristic applied over a shortest-path metric closure. The tests verify:
 
 - **Boundary conditions**: `test_mst_heuristic_edge_cases()` checks empty MST input, one-node MST input, goal states, one-remaining-node states, and non-negative MST values.
 - **Admissibility**: `test_heuristic_is_admissible_for_every_reachable_state()` compares the heuristic against the exact brute-force remaining cost for every reachable state and every metric.
@@ -45,5 +45,5 @@ python -m pytest -q
 Current verified result:
 
 ```text
-15 passed
+19 passed (99% branch coverage)
 ```

@@ -2,7 +2,7 @@
 
 ## Phase 1: Inspection & Initial Findings
 An initial analysis of the codebase and execution of the original test suite revealed several critical gaps:
-1. **Heuristic Inadmissibility:** The MST heuristic implemented in A* used direct edge costs (`_undirected_edge_lower_bound`). For non-metric graphs (where triangle inequality is not guaranteed), direct edges do not provide a guaranteed lower bound for the remaining route cost, causing the heuristic to overestimate the true cost. This compromised the theoretical optimality guarantee of A*.
+1. **Heuristic Inadmissibility:** The original heuristic operated on asymmetric directed costs. The revised heuristic first calculates directed shortest-path distances and then forms an undirected lower-bound edge using the cheaper available directional shortest path. Prim's algorithm is applied to this relaxed metric closure.
 2. **Missing Edge Cases:** The test suite lacked edge case coverage for disconnected graphs, heuristic metric independence, and error branches within the search loops.
 3. **Optimality Oracle Defect:** The original brute-force oracle relied on `itertools.permutations`. Because the problem allows for node revisitation if it yields a cheaper cost (or if required by missing direct edges), strict permutation checking is insufficient and could incorrectly penalize the search algorithms for finding a cheaper composite route.
 4. **Coverage Gaps:** Test coverage was ~75%, missing visualization branches and multiple algorithm error paths.

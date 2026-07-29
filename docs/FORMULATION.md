@@ -17,7 +17,7 @@ state = ("M3", frozenset(["M3"]))     # After visiting M3
 state = ("M5", frozenset(["M1","M2","M3","M4","M5","M6"]))  # Goal state
 ```
 
-**Total state space size:** 7 locations × 2⁶ visited subsets = **448 possible states**
+**Total state space size:** Theoretical unconstrained pairs: 7 × 2⁶ = 448. Consistent reachable member-tour states: 1 + Σ[k × C(6,k)] = 193.
 
 ---
 

@@ -8,6 +8,7 @@ Guaranteed optimal. Blind search — explores in all directions.
 """
 
 import heapq
+import itertools
 from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
 
 
@@ -26,15 +27,17 @@ def ucs(metric: str = "distance") -> dict:
     start_state = ("SU", frozenset())
     goal_visited = frozenset(MEMBERS)
 
-    # Priority queue: (g, state, path)
-    frontier = [(0.0, start_state, ["SU"])]
+    counter = itertools.count()
+
+    # Priority queue: (g, sequence, state, path)
+    frontier = [(0.0, next(counter), start_state, ["SU"])]
     heapq.heapify(frontier)
 
     explored = {}
     nodes_expanded = 0
 
     while frontier:
-        g, state, path = heapq.heappop(frontier)
+        g, _, state, path = heapq.heappop(frontier)
         location, visited = state
 
         if state in explored and explored[state] <= g:
@@ -64,6 +67,6 @@ def ucs(metric: str = "distance") -> dict:
             new_state = (neighbour, new_visited)
 
             if new_state not in explored or explored[new_state] > new_g:
-                heapq.heappush(frontier, (new_g, new_state, path + [neighbour]))
+                heapq.heappush(frontier, (new_g, next(counter), new_state, path + [neighbour]))
 
     return {"error": "No solution found"}

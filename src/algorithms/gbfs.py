@@ -10,6 +10,7 @@ Heuristic: MST of remaining unvisited nodes (same as A*, but g(n) is ignored).
 """
 
 import heapq
+import itertools
 from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
 from src.algorithms.astar import heuristic  # Reuse MST heuristic
 
@@ -29,16 +30,18 @@ def gbfs(metric: str = "distance") -> dict:
     start_state = ("SU", frozenset())
     goal_visited = frozenset(MEMBERS)
 
-    # Priority queue: (h, state, g_actual, path)
+    counter = itertools.count()
+
+    # Priority queue: (h, sequence, state, g_actual, path)
     start_h = heuristic(start_state, metric)
-    frontier = [(start_h, start_state, 0.0, ["SU"])]
+    frontier = [(start_h, next(counter), start_state, 0.0, ["SU"])]
     heapq.heapify(frontier)
 
     visited_states = set()
     nodes_expanded = 0
 
     while frontier:
-        h, state, g, path = heapq.heappop(frontier)
+        h, _, state, g, path = heapq.heappop(frontier)
         location, visited = state
 
         if state in visited_states:
@@ -69,6 +72,6 @@ def gbfs(metric: str = "distance") -> dict:
 
             if new_state not in visited_states:
                 new_h = heuristic(new_state, metric)
-                heapq.heappush(frontier, (new_h, new_state, new_g, path + [neighbour]))
+                heapq.heappush(frontier, (new_h, next(counter), new_state, new_g, path + [neighbour]))
 
     return {"error": "No solution found"}

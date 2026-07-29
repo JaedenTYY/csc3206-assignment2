@@ -10,6 +10,7 @@ f(n) = g(n) + h(n)
 """
 
 import heapq
+import itertools
 from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
 
 
@@ -135,9 +136,11 @@ def astar(metric: str = "distance") -> dict:
     start_state = ("SU", frozenset())
     goal_visited = frozenset(MEMBERS)
 
-    # Priority queue entries: (f, g, state, path)
+    counter = itertools.count()
+
+    # Priority queue entries: (f, g, sequence, state, path)
     start_h = heuristic(start_state, metric)
-    frontier = [(start_h, 0.0, start_state, ["SU"])]
+    frontier = [(start_h, 0.0, next(counter), start_state, ["SU"])]
     heapq.heapify(frontier)
 
     # explored: state → best g(n) seen
@@ -145,7 +148,7 @@ def astar(metric: str = "distance") -> dict:
     nodes_expanded = 0
 
     while frontier:
-        f, g, state, path = heapq.heappop(frontier)
+        f, g, _, state, path = heapq.heappop(frontier)
 
         location, visited = state
 
@@ -180,6 +183,6 @@ def astar(metric: str = "distance") -> dict:
             if new_state not in explored or explored[new_state] > new_g:
                 new_h = heuristic(new_state, metric)
                 new_f = new_g + new_h
-                heapq.heappush(frontier, (new_f, new_g, new_state, path + [neighbour]))
+                heapq.heappush(frontier, (new_f, new_g, next(counter), new_state, path + [neighbour]))
 
     return {"error": "No solution found"}

@@ -39,10 +39,11 @@ To ensure A* is **optimal**, the heuristic $h(n)$ must be **admissible** (meanin
 1. Given the current `location` and the set of `remaining_unvisited` members.
 2. If there is only one remaining member, the heuristic returns the exact direct cost from the current location to that member.
 3. If multiple members remain, the heuristic adds the cheapest outgoing edge from the current location to any remaining member.
-4. It then computes an MST over the remaining members using the cheaper available direction between each pair as an undirected lower-bound edge.
-5. The outgoing lower bound plus the MST cost serves as $h(n)$.
+4. It computes the shortest-path distances between all remaining members to form a metric closure.
+5. It then builds an undirected MST over this shortest-path closure.
+6. The shortest outgoing edge bound plus the MST cost serves as $h(n)$.
 
-Because the route graph is directed and asymmetric, the MST must not use raw directed edges as though they were symmetric. Using the cheaper direction for each undirected pair guarantees that each MST edge is no more expensive than the corresponding directed edge used by any valid route. Therefore, the heuristic remains a lower bound and is empirically tested for every reachable state.
+Because the route graph is non-metric and directed, raw edges cannot be used. The algorithm first calculates directed shortest-path distances using Dijkstra's algorithm and then forms an undirected lower-bound edge using the cheaper available directional shortest path. Prim's algorithm is applied to this relaxed metric closure, ensuring admissibility.
 
 ### 2.3 Python Implementation of A*
 

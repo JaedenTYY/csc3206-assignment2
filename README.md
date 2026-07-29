@@ -1,7 +1,7 @@
 # 🗺️ House Visit Tour: AI Route Planning Implementation
 
-![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
+![Python Version](https://img.shields.io/badge/python-3.10%2B-blue)
+![Build Status](https://github.com/JaedenTYY/csc3206-assignment2/actions/workflows/tests.yml/badge.svg)
 ![AI Algorithms](https://img.shields.io/badge/Algorithms-A*-orange)
 ![Visualization](https://img.shields.io/badge/Visualization-Matplotlib-yellow)
 
@@ -33,7 +33,7 @@ This project implements an intelligent routing system designed to solve a varian
 Design a **house visit tour** starting from Sunway University that visits the residential locations of all 6 group members at least once, using an AI search algorithm to find the optimal route.
 
 - **Start:** Sunway University (SU)
-- **Goal:** Visit M1 → M2 → M3 → M4 → M5 → M6 (all at least once)
+- **Goal:** Start from Sunway University and visit all six member residences at least once, in any order. Returning to Sunway University is not required.
 - **Optimization metric:** Driving distance (km) / driving time (min) / carbon emissions (kg CO₂e)
 
 ---
@@ -43,12 +43,12 @@ Design a **house visit tour** starting from Sunway University that visits the re
 | Node | Member | Address |
 |------|--------|---------|
 | SU | — | Sunway University, Bandar Sunway |
-| M1 | Jaeden | No. 8 Jalan Jarak, Tanamera, Subang Jaya |
-| M2 | Evan | No. 15 Jalan USJ Heights 6/1D, Subang Jaya |
-| M3 | Wai | Sunway House Waterfront Residence, Bandar Sunway |
-| M4 | Sohom | Edumetro, USJ1, Subang Jaya |
-| M5 | Raymond | No. 15 Jalan Kasawari 4, Taman Eng Ann, Klang |
-| M6 | Chin | Yolo Signature Suites, Petaling Jaya |
+| M1 | Jaeden | Tanamera, Subang Jaya |
+| M2 | Evan | USJ Heights, Subang Jaya |
+| M3 | Wai | Bandar Sunway |
+| M4 | Sohom | USJ 1 |
+| M5 | Raymond | Taman Eng Ann, Klang |
+| M6 | Chin | Petaling Jaya |
 
 ---
 
@@ -61,7 +61,7 @@ graph TD
     A[Start Node: Sunway University] --> B{Search Algorithms}
     B -->|A* Search| C[Optimal & Informed]
     B -->|Uniform Cost Search| D[Optimal & Uninformed]
-    B -->|Greedy BFS| E[Suboptimal & Fast]
+    B -->|Greedy Best-First Search| E[Suboptimal & Fast]
     C --> F[Evaluate against Goal State]
     D --> F
     E --> F
@@ -83,11 +83,14 @@ graph TD
 
 ```bash
 # 1. Clone the repo
-git clone <repo-url>
-cd csc3206-a2
+git clone https://github.com/JaedenTYY/csc3206-assignment2.git
+cd csc3206-assignment2
 
 # 2. Install dependencies
+python -m venv .venv
+source .venv/bin/activate   # macOS/Linux
 pip install -r requirements.txt
+pip install -r requirements-dev.txt
 
 # 3. Run the algorithm
 python src/main.py
@@ -211,7 +214,7 @@ The program should print and/or display:
 - [x] Code executes without errors
 - [x] Output displays the solution (text + graphical)
 - [x] README / SETUP.md with execution instructions
-- [x] Automated tests pass (`15 passed`)
+- [x] Automated tests pass (`19 passed`, 99% branch coverage)
 - [ ] Report with all required sections
 - [ ] Presentation video (≤10 min) uploaded to OneDrive/Google Drive
 - [ ] Video link included in report appendix
