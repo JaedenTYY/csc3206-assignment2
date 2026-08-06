@@ -52,7 +52,7 @@
 | 4.3 | Test with different cost metrics (distance vs time vs CO₂) | Evan | `[x]` | Parameterise cost fn |
 | 4.4 | Clean up code + add docstrings | All | `[x]` | Before submission |
 | 4.5 | Final `README.md` / `SETUP.md` review | Jaeden | `[x]` | Must have run instructions |
-| 4.6 | Add robust optimality, CLI, heuristic, and visualization tests | All | `[x]` | `15 passed` via `python -m pytest -q` |
+| 4.6 | Add robust optimality, CLI, heuristic, and visualization tests | All | `[x]` | `26 passed` via `python -m pytest -q` |
 
 ---
 

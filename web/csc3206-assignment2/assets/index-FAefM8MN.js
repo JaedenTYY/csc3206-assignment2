@@ -85,7 +85,7 @@ In order to be iterable, non-array objects must have a [Symbol.iterator]() metho
       
       void main(void) {
         int vid = gl_VertexID;
-        vec2 position = aPosition; // TODO make this a vec3, simplifies some code below
+        vec2 position = aPosition;
 
         if(aVertType == ${sh}) {
           float texX = aTex.x; // texture coordinates

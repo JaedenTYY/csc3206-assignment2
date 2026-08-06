@@ -54,8 +54,6 @@ npm run build
 
 Deployment is handled automatically by GitHub Actions (`.github/workflows/pages.yml`) upon pushing to the `main` branch.
 
-## Evaluation Goals
-
 ## 🗺️ Locations
 
 | Node | Member | Address |
@@ -169,7 +167,7 @@ graph TD
 ## 📁 Repository Structure
 
 ```
-csc3206-a2/
+csc3206-assignment2/
 ├── README.md               # This file
 ├── requirements.txt        # Python dependencies
 ├── .gitignore
@@ -221,9 +219,12 @@ The program should print and/or display:
 | Resource | Link |
 |----------|------|
 | Assignment 1 Report | https://imailsunwayedu-my.sharepoint.com/:w:/g/personal/23009798_imail_sunway_edu_my/IQBguXAhSRcyT5rrHltDkCVjAfpikQIpFefglSySi0ocdHg?e=ffla6l |
-| Presentation Video | https://imailsunwayedu-my.sharepoint.com/:v:/g/personal/23026842_imail_sunway_edu_my/IQAa8K_sFLQ5RYlf-EZXpodFAV3MtIZd1QIeLSBAxYnR6Ss?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=5Pmhwp |
-| Canva Slides | https://canva.link/fu0jfgianwirbze |
+| Assignment 1 Presentation Video | https://imailsunwayedu-my.sharepoint.com/:v:/g/personal/23026842_imail_sunway_edu_my/IQAa8K_sFLQ5RYlf-EZXpodFAV3MtIZd1QIeLSBAxYnR6Ss?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0%3D&e=5Pmhwp |
+| Assignment 2 Slides | https://canva.link/fu0jfgianwirbze |
 | Route Data Screenshots | https://drive.google.com/drive/folders/1xq3B728VkbJXb60iyc9JwS9Vem1cD271 |
+| Assignment 2 Report | https://imailsunwayedu-my.sharepoint.com/:w:/g/personal/23009798_imail_sunway_edu_my/IQBLVKIE2BXgQJga1IE1-5iAAVplmN_KMv-bEpPQv7rx1qc?e=ueNFxs |
+| Assignment 2 Presentation Video | https://youtu.be/VtWmOho4i3k |
+| Assignment 2 Slides | https://canva.link/c9c7ulej303avw3 |
 
 ---
 
@@ -232,7 +233,7 @@ The program should print and/or display:
 - [x] Code executes without errors
 - [x] Output displays the solution (text + graphical)
 - [x] README / SETUP.md with execution instructions
-- [x] Automated tests pass (`19 passed`, 99% branch coverage)
+- [x] Automated tests pass (`26 passed`, 99% branch coverage)
 - [ ] Report with all required sections
 - [ ] Presentation video (≤10 min) uploaded to OneDrive/Google Drive
 - [ ] Video link included in report appendix

@@ -28,19 +28,20 @@ Name                            Stmts   Miss Branch BrPart  Cover   Missing
 ---------------------------------------------------------------------------
 src/__init__.py                     0      0      0      0   100%
 src/algorithms/__init__.py          0      0      0      0   100%
-src/algorithms/astar.py            97      0     48      0   100%
-src/algorithms/gbfs.py             34      0     12      0   100%
-src/algorithms/ucs.py              31      0     12      0   100%
+src/algorithms/astar.py           120      0     54      0   100%
+src/algorithms/gbfs.py             56      0     18      0   100%
+src/algorithms/ucs.py              53      0     18      0   100%
 src/data/__init__.py                0      0      0      0   100%
-src/data/graph.py                  35      0      6      0   100%
-src/main.py                        68      1     16      1    98%   114
+src/data/graph.py                  43      1     10      1    96%   157
+src/main.py                        68      2     16      1    96%   107, 114
 src/visualization/__init__.py       0      0      0      0   100%
-src/visualization/plot.py          60      0     18      0   100%
+src/visualization/plot.py          59      1     18      1    97%   129
+src/web_adapter.py                 49      0     10      0   100%
 ---------------------------------------------------------------------------
-TOTAL                             325      1    112      1    99%
-======================== 19 passed, 2 warnings in 4.05s ========================
+TOTAL                             448      4    144      3    99%
+============================== 26 passed in 2.99s ==============================
 ```
-*(The single missing statement is the standard `if __name__ == "__main__":` block in `main.py`, which is excluded by standard test runner invocation.)*
+*(The four missing statements are line 157 in `src/data/graph.py`, lines 107 and 114 in `src/main.py`, and line 129 in `src/visualization/plot.py`.)*
 
 **Automated Test Invocations**
 The full test suite can be reproducibly executed at any time using:
