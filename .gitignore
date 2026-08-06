@@ -10,3 +10,7 @@ venv/
 !assets/*.png
 .DS_Store
 *.log
+.coverage
+coverage.xml
+htmlcov/
+*.pyc
