@@ -9,7 +9,7 @@ Guaranteed optimal. Blind search — explores in all directions.
 
 import heapq
 import itertools
-from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
+from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric, has_edge
 
 
 def ucs(metric: str = "distance", collect_trace: bool = False) -> dict:
@@ -86,6 +86,8 @@ def ucs(metric: str = "distance", collect_trace: bool = False) -> dict:
 
         generated_successors = 0
         for neighbour in get_neighbours(location):
+            if not has_edge(location, neighbour, metric):
+                continue
             edge_cost = get_cost(location, neighbour, metric)
             new_g = g + edge_cost
             new_visited = visited | {neighbour} if neighbour in MEMBERS else visited

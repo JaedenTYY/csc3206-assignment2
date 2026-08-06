@@ -43,14 +43,16 @@ def build_route_edge_labels(route: list[str], metric: str) -> dict[tuple[str, st
     return labels
 
 
-def plot_route(result: dict, output_path: str = "assets/route_output.png", show: bool = True) -> None:
+def plot_route(result: dict, output_path: str = None, show: bool = True) -> None:
     """Render the graph and highlight the solution route."""
     if "error" in result:
         print("No route to visualize.")
         return
 
     route = result["route"]
-    metric = result["metric"]
+    metric = result.get("metric", "distance")
+    if output_path is None:
+        output_path = f"assets/route_output_{metric}.png"
     validate_metric(metric)
     unit = COST_UNITS[metric]
     matrix = COST_MATRICES[metric]

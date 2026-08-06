@@ -11,7 +11,7 @@ f(n) = g(n) + h(n)
 
 import heapq
 import itertools
-from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric
+from src.data.graph import MEMBERS, get_cost, get_neighbours, validate_metric, has_edge
 
 
 # ── Heuristic: Minimum Spanning Tree lower bound ──────────────────────────────
@@ -200,6 +200,8 @@ def astar(metric: str = "distance", collect_trace: bool = False) -> dict:
         # Expand neighbours
         generated_successors = 0
         for neighbour in get_neighbours(location):
+            if not has_edge(location, neighbour, metric):
+                continue
             edge_cost = get_cost(location, neighbour, metric)
             new_g = g + edge_cost
             new_visited = visited | {neighbour} if neighbour in MEMBERS else visited

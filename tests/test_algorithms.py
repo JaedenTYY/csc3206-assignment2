@@ -327,6 +327,46 @@ def test_no_solution_branch(monkeypatch):
     for name, algo in ALL_ALGORITHMS:
         assert algo("distance") == {"error": "No solution found"}
 
+def test_sparse_graph_handling(monkeypatch):
+    import copy
+    from src.data.graph import COST_MATRICES
+    
+    sparse_matrix = copy.deepcopy(COST_MATRICES["distance"])
+    sparse_matrix["M1"]["M2"] = None
+    
+    monkeypatch.setitem(COST_MATRICES, "distance", sparse_matrix)
+    
+    from src.algorithms.astar import _SP_CACHE
+    _SP_CACHE.clear()
+    
+    for name, algo in ALL_ALGORITHMS:
+        res = algo("distance")
+        assert "error" not in res, f"{name} failed on sparse graph"
+        assert res["total_cost"] > 0
+        
+        route = res["route"]
+        for i in range(len(route) - 1):
+            assert not (route[i] == "M1" and route[i+1] == "M2")
+
+def test_disconnected_graph_handling(monkeypatch):
+    import copy
+    from src.data.graph import COST_MATRICES
+    
+    disconnected_matrix = copy.deepcopy(COST_MATRICES["distance"])
+    for node in disconnected_matrix["M6"]:
+        disconnected_matrix["M6"][node] = None
+    for node in disconnected_matrix:
+        if "M6" in disconnected_matrix[node]:
+            disconnected_matrix[node]["M6"] = None
+            
+    monkeypatch.setitem(COST_MATRICES, "distance", disconnected_matrix)
+    
+    from src.algorithms.astar import _SP_CACHE
+    _SP_CACHE.clear()
+    
+    for name, algo in ALL_ALGORITHMS:
+        assert algo("distance") == {"error": "No solution found"}
+
 def test_trace_collection_all():
     from src.algorithms.astar import astar
     from src.algorithms.ucs import ucs
@@ -434,7 +474,7 @@ def test_cli_subprocess_visualize(tmp_path):
     res = subprocess.run([sys.executable, str(ROOT_DIR / "src/main.py"), "--visualize"], capture_output=True, text=True, cwd=tmp_path, env=env)
     assert res.returncode == 0
     assert "Visualization saved" in res.stdout
-    out_file = tmp_path / "assets" / "route_output.png"
+    out_file = tmp_path / "assets" / "route_output_distance.png"
     assert out_file.exists()
     assert out_file.stat().st_size > 0
 

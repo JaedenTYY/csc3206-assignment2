@@ -3,6 +3,8 @@
 > **Deadline: 2 August 2026, 23:59 (End of Week 12)**  
 > Update status as you go: `[ ]` → `[~]` (in progress) → `[x]` (done)
 
+*Note: This board records the initial assignment and allocation of tasks. Responsibilities changed during the final integration phase.*
+
 ---
 
 ## 🔴 Phase 1 — Setup (Week 8–9)
